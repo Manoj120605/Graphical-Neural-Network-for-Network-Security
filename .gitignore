@@ -40,3 +40,4 @@ graph_anomaly_map.png
 models/*.pt
 syntheticdata/*.csv
 visualization/*.png
+doc/
