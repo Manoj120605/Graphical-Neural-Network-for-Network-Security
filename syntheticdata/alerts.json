@@ -1,23 +1,4 @@
 {
-  "alerts": [
-    {
-      "alert_type": "ANOMALY_DETECTED",
-      "node_id": 0,
-      "anomaly_score": 8.252724,
-      "threshold": 4.565346,
-      "severity": "HIGH",
-      "reason": "deviation from neighborhood embedding",
-      "timestamp": "2026-03-13T06:08:21.013842+00:00"
-    },
-    {
-      "alert_type": "ANOMALY_DETECTED",
-      "node_id": 21,
-      "anomaly_score": 4.891096,
-      "threshold": 4.565346,
-      "severity": "MEDIUM",
-      "reason": "deviation from neighborhood embedding",
-      "timestamp": "2026-03-13T06:08:21.013864+00:00"
-    }
-  ],
-  "total": 2
+  "alerts": [],
+  "total": 0
 }
