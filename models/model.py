@@ -4,13 +4,22 @@ model.py
 GraphSAGE encoder for node-level embedding generation.
 
 Architecture
-    SAGEConv(16 → 32) → ReLU → Dropout(0.3)
-    SAGEConv(32 → 16) → node embeddings
+    SAGEConv(16 -> 32) -> ReLU -> Dropout(0.3)
+    SAGEConv(32 -> 16) -> node embeddings
+
+Supports automatic CUDA device selection when a GPU is available.
 """
 
 import torch
 import torch.nn.functional as F
 from torch_geometric.nn import SAGEConv
+
+
+def get_device() -> torch.device:
+    """Return CUDA device if available, otherwise CPU."""
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    return torch.device("cpu")
 
 
 class GraphSAGEEncoder(torch.nn.Module):
@@ -29,14 +38,7 @@ class GraphSAGEEncoder(torch.nn.Module):
     def forward(self, x: torch.Tensor,
                 edge_index: torch.Tensor) -> torch.Tensor:
         """
-        Forward pass — returns node embeddings.
-
-        Args:
-            x:          Node feature matrix  [N, in_dim]
-            edge_index: COO edge index       [2, E]
-
-        Returns:
-            Embedding matrix  [N, out_dim]
+        Forward pass -- returns node embeddings [N, out_dim].
         """
         h = self.conv1(x, edge_index)
         h = F.relu(h)

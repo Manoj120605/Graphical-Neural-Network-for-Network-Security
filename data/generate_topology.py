@@ -1,9 +1,12 @@
 """
 generate_topology.py
 ====================
-Builds a synthetic Barabási–Albert network topology (50 nodes, 16-dim
+Builds a synthetic Barabasi-Albert network topology (50 nodes, 16-dim
 telemetry features), injects one anomaly node, and exports the result
 as a PyTorch Geometric Data object.
+
+Graph conversion (NetworkX -> PyG) is integrated here rather than in
+a separate module, as described in SYSTEM_DESIGN.md Section 5.
 """
 
 import os
@@ -13,13 +16,12 @@ import torch
 from torch_geometric.data import Data
 from torch_geometric.utils import from_networkx
 
-# ──────────────────────────── Configuration ────────────────────────────
+# ---- Configuration --------------------------------------------------------
 NUM_NODES = 50
 FEATURE_DIM = 16
 ANOMALY_NODE_ID = 0
 RANDOM_SEED = 42
 
-# Feature names matching SYSTEM_DESIGN §4
 FEATURE_NAMES = [
     "traffic_in", "traffic_out", "packet_loss", "latency",
     "crc_errors", "cpu_usage", "memory_usage", "connection_count",
@@ -27,34 +29,27 @@ FEATURE_NAMES = [
     "route_changes", "neighbor_count", "retransmissions", "queue_depth",
 ]
 
-# Normal feature distribution
 NORMAL_MEAN = 0.0
 NORMAL_STD = 1.0
-
-# Anomaly feature distribution — shifted far from normal
 ANOMALY_MEAN = 10.0
 ANOMALY_STD = 2.0
 
-# ──────────────────────────── Reproducibility ──────────────────────────
 np.random.seed(RANDOM_SEED)
 
 
 def build_topology(num_nodes: int = NUM_NODES) -> nx.Graph:
     """
-    Create a Barabási–Albert scale-free graph, which mimics real-world
-    network topologies (hubs, power-law degree distribution).
-    Each new node attaches to m=3 existing nodes.
+    Create a Barabasi-Albert scale-free graph (m=3).
+    Mimics real-world network topologies with hubs.
     """
-    G = nx.barabasi_albert_graph(n=num_nodes, m=3, seed=RANDOM_SEED)
-    return G
+    return nx.barabasi_albert_graph(n=num_nodes, m=3, seed=RANDOM_SEED)
 
 
 def assign_features(G: nx.Graph,
                     anomaly_id: int = ANOMALY_NODE_ID) -> np.ndarray:
     """
-    Assign a 16-dimensional feature vector to every node.
-        Normal nodes  ← N(0, 1)
-        Anomaly node  ← N(10, 2)   (clearly separable)
+    16-dim feature vector per node.
+    Normal nodes <- N(0, 1), anomaly node <- N(10, 2).
     """
     num_nodes = G.number_of_nodes()
     features = np.random.normal(NORMAL_MEAN, NORMAL_STD,
@@ -75,8 +70,8 @@ def create_labels(num_nodes: int = NUM_NODES,
 def to_pyg_data(G: nx.Graph, features: np.ndarray,
                 labels: np.ndarray) -> Data:
     """
-    Convert the NetworkX graph + feature/label arrays into a
-    torch_geometric.data.Data object.
+    Convert NetworkX graph + numpy arrays into a PyTorch Geometric
+    Data object (graph conversion step from SYSTEM_DESIGN Section 5).
     """
     pyg = from_networkx(G)
     pyg.x = torch.tensor(features, dtype=torch.float32)
@@ -88,10 +83,8 @@ def to_pyg_data(G: nx.Graph, features: np.ndarray,
 
 def generate(output_dir: str = "syntheticdata") -> Data:
     """
-    Full generation pipeline — build graph, assign features, inject
+    Full generation pipeline -- build graph, assign features, inject
     anomaly, convert to PyG, and save to disk.
-
-    Returns the PyG Data object.
     """
     os.makedirs(output_dir, exist_ok=True)
 
@@ -103,12 +96,12 @@ def generate(output_dir: str = "syntheticdata") -> Data:
     save_path = os.path.join(output_dir, "synthetic_graph.pt")
     torch.save(data, save_path)
 
-    print(f"[data] Graph : {data.num_nodes} nodes, "
-          f"{data.edge_index.shape[1]} directed edges")
-    print(f"[data] Features : {data.x.shape}  "
-          f"(normal μ={NORMAL_MEAN}, anomaly μ={ANOMALY_MEAN})")
-    print(f"[data] Anomaly  : node {ANOMALY_NODE_ID}")
-    print(f"[data] Saved    → {save_path}")
+    print("[data] Graph : %d nodes, %d directed edges"
+          % (data.num_nodes, data.edge_index.shape[1]))
+    print("[data] Features : %s  (normal mu=%.1f, anomaly mu=%.1f)"
+          % (tuple(data.x.shape), NORMAL_MEAN, ANOMALY_MEAN))
+    print("[data] Anomaly  : node %d" % ANOMALY_NODE_ID)
+    print("[data] Saved    : %s" % save_path)
 
     return data
 
