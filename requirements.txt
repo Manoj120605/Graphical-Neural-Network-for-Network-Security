@@ -1,3 +1,8 @@
+numpy
+matplotlib
+networkx
+torch
+torch-geometric
 torch>=2.0.0
 torch-geometric>=2.4.0
 networkx>=3.0
