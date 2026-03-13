@@ -1,4 +1,41 @@
 {
-  "alerts": [],
-  "total": 0
+  "alerts": [
+    {
+      "alert_type": "ANOMALY_DETECTED",
+      "node_id": 50,
+      "anomaly_score": 0.0,
+      "threshold": 0.0,
+      "severity": "MEDIUM",
+      "reason": "deviation from neighborhood embedding",
+      "timestamp": "2026-03-13T06:55:28.062565+00:00"
+    },
+    {
+      "alert_type": "ANOMALY_DETECTED",
+      "node_id": 51,
+      "anomaly_score": 0.0,
+      "threshold": 0.0,
+      "severity": "MEDIUM",
+      "reason": "deviation from neighborhood embedding",
+      "timestamp": "2026-03-13T06:55:28.062565+00:00"
+    },
+    {
+      "alert_type": "ANOMALY_DETECTED",
+      "node_id": 52,
+      "anomaly_score": 0.0,
+      "threshold": 0.0,
+      "severity": "MEDIUM",
+      "reason": "deviation from neighborhood embedding",
+      "timestamp": "2026-03-13T06:55:28.062565+00:00"
+    },
+    {
+      "alert_type": "ANOMALY_DETECTED",
+      "node_id": 53,
+      "anomaly_score": 0.0,
+      "threshold": 0.0,
+      "severity": "MEDIUM",
+      "reason": "deviation from neighborhood embedding",
+      "timestamp": "2026-03-13T06:55:28.062565+00:00"
+    }
+  ],
+  "total": 4
 }
