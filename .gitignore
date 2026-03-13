@@ -19,7 +19,7 @@ htmlcov/
 build/
 dist/
 *.egg-info/
-
+doc/
 # Jupyter
 .ipynb_checkpoints/
 
@@ -40,3 +40,4 @@ graph_anomaly_map.png
 models/*.pt
 syntheticdata/*.csv
 visualization/*.png
+doc/

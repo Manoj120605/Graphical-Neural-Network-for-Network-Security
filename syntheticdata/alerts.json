@@ -1,0 +1,23 @@
+{
+  "alerts": [
+    {
+      "alert_type": "ANOMALY_DETECTED",
+      "node_id": 0,
+      "anomaly_score": 8.54609,
+      "threshold": 4.464839,
+      "severity": "HIGH",
+      "reason": "deviation from neighborhood embedding",
+      "timestamp": "2026-03-13T05:23:57.249833+00:00"
+    },
+    {
+      "alert_type": "ANOMALY_DETECTED",
+      "node_id": 43,
+      "anomaly_score": 4.8107,
+      "threshold": 4.464839,
+      "severity": "MEDIUM",
+      "reason": "deviation from neighborhood embedding",
+      "timestamp": "2026-03-13T05:23:57.249859+00:00"
+    }
+  ],
+  "total": 2
+}
