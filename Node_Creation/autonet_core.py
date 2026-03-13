@@ -43,7 +43,7 @@ def get_telemetry(nodes):
             
             # Logic: 1.0 if 'telnet' is found (Anomaly), else 0.0 (Clean)
             telnet_drift = 1.0 if "telnet" in config.lower() else 0.0
-            feature_matrix.append([node['name'], telnet_drift])
+            feature_matrix.append({'name': node['name'], 'drift_score': telnet_drift})
                 
         except Exception as e:
             print(f"❌ Failed to reach {node['name']}: {e}")
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     
     print("\n--- AutoNet-GNN Feature Matrix (Config Drift Plane) ---")
     for r in results:
-        status = "🚩 ANOMALY" if r[1] == 1.0 else "🟢 CLEAN"
-        print(f"Node: {r[0]} | Drift Score: {r[1]} | Status: {status}")
+        status = "🚩 ANOMALY" if r['drift_score'] == 1.0 else "🟢 CLEAN"
+        print(f"Node: {r['name']} | Drift Score: {r['drift_score']} | Status: {status}")
     
     print(f"\nScan completed in {round(time.time() - start_time, 2)} seconds.")
