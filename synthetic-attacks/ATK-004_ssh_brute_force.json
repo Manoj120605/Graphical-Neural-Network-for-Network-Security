@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "description": "Synthetic dummy attack pattern for cybersecurity simulation in Docker environments",
+    "version": "1.0.0",
+    "purpose": "Educational / Red-Blue Team Lab Simulation",
+    "generated": "2026-03-13",
+    "warning": "FOR SIMULATION USE ONLY — Do not use against real infrastructure"
+  },
+  "id": "ATK-004",
+  "name": "Brute Force SSH Credential Attack",
+  "category": "Credential Access",
+  "mitre_att_ck": "T1110.001",
+  "description": "Automated credential stuffing and dictionary attack against SSH service to gain unauthorized access.",
+  "severity": "high",
+  "docker_target": "victim-ssh-server:22",
+  "simulation": {
+    "tool": "hydra / medusa",
+    "pattern": "dictionary_brute_force",
+    "protocol": "SSH",
+    "usernames": ["root", "admin", "ubuntu", "ec2-user", "pi", "user", "test", "deploy"],
+    "password_list": "rockyou-top-1000.txt",
+    "threads": 4,
+    "delay_between_attempts_ms": 200,
+    "max_attempts_per_user": 100,
+    "rotate_source_ip": true,
+    "success_credentials": {
+      "username": "admin",
+      "password": "Password123!",
+      "inject_at_attempt": 847
+    }
+  },
+  "indicators_of_compromise": [
+    "Repeated SSH auth failures from same IP",
+    "Multiple usernames tried from single source",
+    "Auth attempts at inhuman speed",
+    "Login from unusual geolocation after failures"
+  ],
+  "detection_rules": {
+    "max_failed_logins": 5,
+    "window_seconds": 60,
+    "action": "temporary_ban_and_alert"
+  },
+  "docker_compose_hint": {
+    "victim-ssh-server": { "image": "linuxserver/openssh-server", "ports": ["2222:22"] },
+    "attacker-node": { "image": "kalilinux/kali-rolling", "cap_add": ["NET_ADMIN"] }
+  }
+}

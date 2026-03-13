@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "description": "Synthetic dummy attack pattern for cybersecurity simulation in Docker environments",
+    "version": "1.0.0",
+    "purpose": "Educational / Red-Blue Team Lab Simulation",
+    "generated": "2026-03-13",
+    "warning": "FOR SIMULATION USE ONLY — Do not use against real infrastructure"
+  },
+  "id": "ATK-001",
+  "name": "DDoS Pulse Wave Attack",
+  "category": "Denial of Service",
+  "mitre_att_ck": "T1498",
+  "description": "Short, high-volume traffic bursts fired in repeated intervals to overwhelm target while evading rate-limit detections.",
+  "severity": "critical",
+  "docker_target": "victim-web-service:80",
+  "simulation": {
+    "tool": "hping3 / scapy",
+    "pattern": "pulse_wave",
+    "pulse_duration_ms": 500,
+    "idle_duration_ms": 1000,
+    "cycles": 20,
+    "packets_per_pulse": 50000,
+    "protocol": "UDP",
+    "src_ip_spoofing": true,
+    "src_ip_pool": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],
+    "dst_port": 80,
+    "packet_size_bytes": 1024,
+    "amplification_factor": 3.5
+  },
+  "traffic_profile": {
+    "baseline_pps": 1000,
+    "attack_pps": 500000,
+    "peak_gbps": 2.4,
+    "duration_seconds": 30
+  },
+  "indicators_of_compromise": [
+    "Sudden spike >100x baseline traffic",
+    "High UDP/ICMP ratio",
+    "Identical packet sizes in bursts",
+    "Short TTL values across many sources"
+  ],
+  "detection_rules": {
+    "threshold_pps": 50000,
+    "window_seconds": 5,
+    "action": "block_and_alert"
+  },
+  "docker_compose_hint": {
+    "victim-web-service": { "image": "nginx:alpine", "ports": ["80:80"] },
+    "attacker-node": { "image": "kalilinux/kali-rolling", "cap_add": ["NET_ADMIN", "NET_RAW"] }
+  }
+}

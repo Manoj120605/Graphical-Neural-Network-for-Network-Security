@@ -1,0 +1,49 @@
+{
+  "meta": {
+    "description": "Synthetic dummy attack pattern for cybersecurity simulation in Docker environments",
+    "version": "1.0.0",
+    "purpose": "Educational / Red-Blue Team Lab Simulation",
+    "generated": "2026-03-13",
+    "warning": "FOR SIMULATION USE ONLY — Do not use against real infrastructure"
+  },
+  "id": "ATK-006",
+  "name": "ARP Spoofing / Man-in-the-Middle",
+  "category": "Man-in-the-Middle",
+  "mitre_att_ck": "T1557.002",
+  "description": "Attacker broadcasts fake ARP replies to poison the ARP cache of hosts, redirecting traffic through attacker node.",
+  "severity": "high",
+  "docker_target": "internal-lan-segment:172.20.0.0/24",
+  "simulation": {
+    "tool": "arpspoof / ettercap / scapy",
+    "pattern": "bidirectional_arp_poison",
+    "attacker_mac": "de:ad:be:ef:00:01",
+    "attacker_ip": "172.20.0.99",
+    "victim_ip": "172.20.0.10",
+    "gateway_ip": "172.20.0.1",
+    "arp_reply_interval_ms": 2000,
+    "enable_ip_forwarding": true,
+    "intercept_protocols": ["HTTP", "FTP", "SMTP", "Telnet"],
+    "ssl_strip": true
+  },
+  "attack_stages": [
+    { "stage": 1, "action": "Send gratuitous ARP: victim's IP → attacker MAC" },
+    { "stage": 2, "action": "Send gratuitous ARP: gateway IP → attacker MAC" },
+    { "stage": 3, "action": "All victim↔gateway traffic routes through attacker" },
+    { "stage": 4, "action": "Capture/modify traffic in transit" }
+  ],
+  "indicators_of_compromise": [
+    "Duplicate IP addresses in ARP table",
+    "MAC address change for gateway",
+    "Broadcast ARP storm",
+    "Unexpected traffic volumes through single host"
+  ],
+  "detection_rules": {
+    "monitor_arp_table_changes": true,
+    "alert_on_duplicate_ip_different_mac": true,
+    "action": "isolate_port_and_alert"
+  },
+  "docker_compose_hint": {
+    "victim-host": { "image": "alpine", "networks": ["lan"] },
+    "attacker-node": { "image": "kalilinux/kali-rolling", "cap_add": ["NET_ADMIN", "NET_RAW"], "networks": ["lan"] }
+  }
+}

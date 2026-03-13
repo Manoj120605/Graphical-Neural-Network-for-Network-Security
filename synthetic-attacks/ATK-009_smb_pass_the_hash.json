@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "description": "Synthetic dummy attack pattern for cybersecurity simulation in Docker environments",
+    "version": "1.0.0",
+    "purpose": "Educational / Red-Blue Team Lab Simulation",
+    "generated": "2026-03-13",
+    "warning": "FOR SIMULATION USE ONLY — Do not use against real infrastructure"
+  },
+  "id": "ATK-009",
+  "name": "Lateral Movement via SMB Pass-the-Hash",
+  "category": "Lateral Movement / Credential Access",
+  "mitre_att_ck": "T1550.002",
+  "description": "Uses captured NTLM password hashes to authenticate to other hosts without knowing the plaintext password.",
+  "severity": "critical",
+  "docker_target": "windows-sim-smb:445",
+  "simulation": {
+    "tool": "impacket / psexec.py",
+    "pattern": "pass_the_hash",
+    "captured_ntlm_hash": "aad3b435b51404eeaad3b435b51404ee:8846f7eaee8fb117ad06bdd830b7586c",
+    "target_hosts": [
+      "172.20.0.11",
+      "172.20.0.12",
+      "172.20.0.13"
+    ],
+    "domain": "CORP",
+    "username": "administrator",
+    "smb_port": 445,
+    "pivot_commands": [
+      "whoami",
+      "net localgroup administrators",
+      "net user /domain",
+      "ipconfig /all"
+    ],
+    "payload_dropped": "/tmp/synth_beacon.exe (dummy zero-byte file)"
+  },
+  "indicators_of_compromise": [
+    "SMB authentication with NTLM from unexpected host",
+    "Logon Type 3 from non-standard source",
+    "Rapid service creation on remote host",
+    "Admin share access (C$, ADMIN$) from new host"
+  ],
+  "detection_rules": {
+    "alert_on_admin_share_access": true,
+    "monitor_ntlm_lateral_logons": true,
+    "action": "block_and_escalate"
+  },
+  "docker_compose_hint": {
+    "windows-sim-smb": { "image": "dperson/samba", "ports": ["445:445"] },
+    "attacker-node": { "image": "kalilinux/kali-rolling", "cap_add": ["NET_ADMIN"] }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "meta": {
+    "description": "Synthetic dummy attack pattern for cybersecurity simulation in Docker environments",
+    "version": "1.0.0",
+    "purpose": "Educational / Red-Blue Team Lab Simulation",
+    "generated": "2026-03-13",
+    "warning": "FOR SIMULATION USE ONLY — Do not use against real infrastructure"
+  },
+  "id": "ATK-008",
+  "name": "HTTP Slow Loris DoS",
+  "category": "Denial of Service",
+  "mitre_att_ck": "T1499.002",
+  "description": "Holds open thousands of HTTP connections by sending partial headers slowly, exhausting server connection pool.",
+  "severity": "high",
+  "docker_target": "victim-web-service:80",
+  "simulation": {
+    "tool": "slowloris / custom socket script",
+    "pattern": "slow_headers",
+    "concurrent_connections": 5000,
+    "header_send_interval_seconds": 10,
+    "partial_headers": [
+      "GET / HTTP/1.1\r\n",
+      "Host: victim-web-service\r\n",
+      "X-Padding-Header-{n}: A\r\n"
+    ],
+    "never_send_final_crlf": true,
+    "connection_timeout_avoidance": true,
+    "duration_seconds": 300
+  },
+  "indicators_of_compromise": [
+    "Max connection count constantly at limit",
+    "Many connections in ESTABLISHED state with no data transfer",
+    "Legitimate users receive 503 Service Unavailable",
+    "Single source IP with thousands of open sockets"
+  ],
+  "detection_rules": {
+    "max_connections_per_ip": 50,
+    "incomplete_header_timeout_seconds": 20,
+    "action": "drop_connection_and_rate_limit"
+  },
+  "docker_compose_hint": {
+    "victim-web-service": { "image": "nginx:alpine", "ports": ["80:80"] },
+    "attacker-node": { "image": "kalilinux/kali-rolling" }
+  }
+}

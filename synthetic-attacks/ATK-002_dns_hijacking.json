@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "description": "Synthetic dummy attack pattern for cybersecurity simulation in Docker environments",
+    "version": "1.0.0",
+    "purpose": "Educational / Red-Blue Team Lab Simulation",
+    "generated": "2026-03-13",
+    "warning": "FOR SIMULATION USE ONLY — Do not use against real infrastructure"
+  },
+  "id": "ATK-002",
+  "name": "DNS Hijacking",
+  "category": "Man-in-the-Middle / Credential Access",
+  "mitre_att_ck": "T1584.002",
+  "description": "Attacker poisons DNS responses to redirect legitimate domain queries to malicious IP addresses.",
+  "severity": "high",
+  "docker_target": "internal-dns-server:53",
+  "simulation": {
+    "tool": "dnschef / scapy",
+    "pattern": "dns_spoof",
+    "spoofed_domains": [
+      "internal.corp.local",
+      "login.corp.local",
+      "vpn.corp.local"
+    ],
+    "legitimate_ips": ["192.168.10.5", "192.168.10.20", "192.168.10.50"],
+    "attacker_ips": ["10.99.0.1", "10.99.0.2", "10.99.0.3"],
+    "query_type": ["A", "AAAA", "CNAME"],
+    "ttl_override_seconds": 30,
+    "response_delay_ms": 5
+  },
+  "attack_stages": [
+    { "stage": 1, "action": "ARP spoof gateway to intercept DNS UDP/53 traffic" },
+    { "stage": 2, "action": "Forge DNS reply with attacker-controlled IP before real resolver responds" },
+    { "stage": 3, "action": "Victim browsers/apps connect to fake server" },
+    { "stage": 4, "action": "Capture credentials via fake login portal" }
+  ],
+  "indicators_of_compromise": [
+    "DNS response source IP mismatch",
+    "Unexpected CNAME chains",
+    "DNS TTL values suddenly very low",
+    "Multiple NXDOMAIN followed by sudden resolution"
+  ],
+  "detection_rules": {
+    "monitor_dns_response_ip_changes": true,
+    "alert_on_ttl_below": 60,
+    "dnssec_validation": true,
+    "action": "quarantine_host_and_alert"
+  },
+  "docker_compose_hint": {
+    "internal-dns-server": { "image": "coredns/coredns", "ports": ["53:53/udp"] },
+    "attacker-node": { "image": "kalilinux/kali-rolling", "cap_add": ["NET_ADMIN", "NET_RAW"] }
+  }
+}

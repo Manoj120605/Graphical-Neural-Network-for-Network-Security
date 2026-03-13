@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "description": "Synthetic dummy attack pattern for cybersecurity simulation in Docker environments",
+    "version": "1.0.0",
+    "purpose": "Educational / Red-Blue Team Lab Simulation",
+    "generated": "2026-03-13",
+    "warning": "FOR SIMULATION USE ONLY — Do not use against real infrastructure"
+  },
+  "id": "ATK-010",
+  "name": "Exfiltration over DNS Tunneling",
+  "category": "Exfiltration",
+  "mitre_att_ck": "T1048.003",
+  "description": "Encodes stolen data into DNS query subdomains and sends them to attacker-controlled DNS server to bypass firewalls.",
+  "severity": "high",
+  "docker_target": "victim-host → attacker-dns:53",
+  "simulation": {
+    "tool": "dnscat2 / iodine (synthetic mode)",
+    "pattern": "dns_tunnel_exfil",
+    "attacker_ns_domain": "exfil.synth-lab.local",
+    "attacker_dns_ip": "10.99.0.5",
+    "encoding": "base32",
+    "chunk_size_bytes": 50,
+    "synthetic_payload": "SYNTHETIC_SECRET_DATA_DO_NOT_USE_IN_PROD",
+    "total_chunks": 40,
+    "query_interval_ms": 500,
+    "query_pattern": "{chunk_id}.{b32_data}.exfil.synth-lab.local",
+    "query_types": ["A", "TXT", "MX"],
+    "obfuscation": "randomize_subdomain_length"
+  },
+  "indicators_of_compromise": [
+    "Unusually long DNS query subdomains",
+    "High frequency DNS queries to single domain",
+    "DNS TXT records with base64/base32 content",
+    "Queries to non-standard or newly registered DNS"
+  ],
+  "detection_rules": {
+    "max_subdomain_length": 40,
+    "max_dns_queries_per_minute_per_host": 60,
+    "alert_on_txt_query_anomaly": true,
+    "action": "block_dns_to_suspect_ns_and_alert"
+  },
+  "docker_compose_hint": {
+    "victim-host": { "image": "alpine" },
+    "attacker-dns": { "image": "coredns/coredns", "ports": ["53:53/udp"] }
+  }
+}

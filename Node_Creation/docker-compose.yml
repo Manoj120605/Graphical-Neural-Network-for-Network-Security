@@ -14,7 +14,7 @@ services:
     deploy:
       replicas: 4
     networks:
-      - backbone_net
+      - node_creation_backbone_net
 
   # LEAF NODES (The Edge of the Graph)
   leaf:
@@ -31,12 +31,12 @@ services:
     deploy:
       replicas: 36
     networks:
-      - backbone_net
+      - node_creation_backbone_net
     depends_on:
       - spine
 
 networks:
-  backbone_net:
+  node_creation_backbone_net:
     driver: bridge
     ipam:
       config:
