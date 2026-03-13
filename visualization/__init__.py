@@ -1,1 +1,1 @@
-from .visualize_graph import visualize
+from .visualize_graph import visualize, visualize_interactive
