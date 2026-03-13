@@ -7,8 +7,8 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'GNN'))
 
 from langchain_community.vectorstores import Chroma
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain.schema import Document
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_core.documents import Document
 
 CHROMA_DIR = "./chroma_db"
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"  # free, runs locally
