@@ -171,7 +171,8 @@ def visualize_interactive(data: Data,
                               "width": 1.0})
 
     # ── Alerts ──
-    alerts_path = os.path.join("syntheticdata", "alerts.json")
+    _project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    alerts_path = os.path.join(_project_root, "syntheticdata", "alerts.json")
     alerts_list = []
     if os.path.exists(alerts_path):
         with open(alerts_path, "r", encoding="utf-8") as f:

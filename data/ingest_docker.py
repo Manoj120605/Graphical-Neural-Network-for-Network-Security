@@ -30,7 +30,10 @@ _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
-from Node_Creation.autonet_core import discover_nodes, get_telemetry
+# NOTE: Node_Creation.autonet_core imports the Docker SDK at module level.
+# We defer that import to ingest() so the pure helper functions
+# (_build_bipartite_graph, _pad_features, _to_pyg_data) can be imported
+# and tested without Docker installed.
 
 # ---- Constants ------------------------------------------------------------
 FEATURE_DIM = 16          # must match GraphSAGEEncoder(in_dim=16)
@@ -154,6 +157,9 @@ def ingest(output_dir: str = OUTPUT_DIR) -> Data:
     """
     os.makedirs(output_dir, exist_ok=True)
     start = time.time()
+
+    # Lazy import — requires Docker SDK (only needed for live ingestion)
+    from Node_Creation.autonet_core import discover_nodes, get_telemetry
 
     # -- Step 1: Ingestion ---------------------------------------------------
     print("[ingest] Step 1/5  Discovering Docker containers ...")
