@@ -1,6 +1,6 @@
 """
 Offline dry-run test for data/ingest_docker.py internal helpers.
-Validates graph construction, feature padding, and PyG conversion
+Validates graph construction, feature building, and PyG conversion
 WITHOUT requiring Docker or SSH connectivity.
 """
 import os
@@ -14,7 +14,7 @@ if PROJECT_ROOT not in sys.path:
 # We need to make the project root the one that matches the repo
 os.chdir(PROJECT_ROOT)
 
-from data.ingest_docker import _build_bipartite_graph, _pad_features, _to_pyg_data
+from data.ingest_docker import _build_bipartite_graph, _build_features, _to_pyg_data
 
 # ---- Mock data (simulates 4 spine + 6 leaf for speed) ---------------------
 MOCK_NAMES = [
@@ -25,10 +25,20 @@ MOCK_NAMES = [
     "codetocareear-leaf-5", "codetocareear-leaf-6",
 ]
 
-MOCK_TELEMETRY = [
-    [name, 1.0 if name == "codetocareear-leaf-3" else 0.0]
-    for name in MOCK_NAMES
-]
+# Simulate 16D telemetry: leaf-3 has distinctly different traffic pattern
+MOCK_TELEMETRY = []
+for name in MOCK_NAMES:
+    if name == "codetocareear-leaf-3":
+        # Anomalous node: high traffic, high CPU, SSH drift
+        feats = [50000.0, 80000.0, 5.0, 0.0, 3.0,
+                 0.95, 0.88, 120.0, 8.0, 5.0,
+                 0.0, 0.0, 3.0, 10.0, 0.0, 1.0]
+    else:
+        # Normal nodes: low traffic, low CPU, no drift
+        feats = [1000.0, 1500.0, 0.0, 0.0, 0.0,
+                 0.05, 0.30, 10.0, 0.0, 0.0,
+                 0.0, 0.0, 1.0, 4.0, 0.0, 0.0]
+    MOCK_TELEMETRY.append([name, feats])
 
 NUM_SPINE = 4
 NUM_LEAF = 6
@@ -58,35 +68,35 @@ def test_bipartite_graph():
           % (TOTAL, expected_edges))
 
 
-def test_feature_padding():
-    features, labels = _pad_features(MOCK_TELEMETRY, MOCK_NAMES)
+def test_feature_building():
+    features, labels = _build_features(MOCK_TELEMETRY, MOCK_NAMES)
 
     # Shape must be (N, 16)
     assert features.shape == (TOTAL, 16), \
         f"Expected shape ({TOTAL}, 16), got {features.shape}"
 
-    # Drift scores at index 0
-    for idx, name in enumerate(MOCK_NAMES):
-        expected_score = 1.0 if name == "codetocareear-leaf-3" else 0.0
-        assert features[idx, 0] == expected_score, \
-            f"Node {name}: expected drift={expected_score}, got {features[idx, 0]}"
+    # After z-score normalisation, the anomalous node (leaf-3)
+    # should have a distinctly different feature vector from the rest
+    leaf3_idx = MOCK_NAMES.index("codetocareear-leaf-3")
+    leaf3_feats = features[leaf3_idx]
 
-    # Indices 1-15 must be zero
-    assert (features[:, 1:] == 0.0).all(), \
-        "Non-zero values found in padded dimensions 1-15"
+    # At least some features of the anomalous node should be outliers
+    # (z-score magnitude > 1.0 for features that have variance)
+    outlier_dims = sum(1 for f in leaf3_feats if abs(f) > 1.0)
+    assert outlier_dims > 0, \
+        "Anomalous node should have at least some outlier features after z-score"
 
-    # Labels: 1 for anomaly, 0 for normal
-    anomaly_count = int(labels.sum())
-    assert anomaly_count == 1, \
-        f"Expected 1 anomaly, got {anomaly_count}"
+    # Live mode: all labels should be 0 (no ground truth)
+    assert labels.sum() == 0, \
+        f"Expected all labels to be 0 (live mode), got sum={labels.sum()}"
 
-    print("[PASS] Feature padding: shape=%s, anomalies=%d, padding correct"
-          % (features.shape, anomaly_count))
+    print("[PASS] Feature building: shape=%s, outlier_dims=%d, labels all-zero (live mode)"
+          % (features.shape, outlier_dims))
 
 
 def test_pyg_conversion():
     G = _build_bipartite_graph(MOCK_NAMES)
-    features, labels = _pad_features(MOCK_TELEMETRY, MOCK_NAMES)
+    features, labels = _build_features(MOCK_TELEMETRY, MOCK_NAMES)
     data = _to_pyg_data(G, features, labels)
 
     # data.x shape
@@ -108,10 +118,11 @@ def test_pyg_conversion():
 
     # Masks
     assert data.train_mask.all(), "train_mask should be all True"
-    assert data.anomaly_mask.sum().item() == 1, \
-        f"anomaly_mask should flag exactly 1 node"
 
-    print("[PASS] PyG conversion: x=%s, y=%s, edges=%d, masks OK"
+    # is_live flag
+    assert getattr(data, "is_live", False), "data.is_live should be True"
+
+    print("[PASS] PyG conversion: x=%s, y=%s, edges=%d, is_live=True"
           % (tuple(data.x.shape), tuple(data.y.shape), data.edge_index.shape[1]))
 
 
@@ -122,7 +133,7 @@ if __name__ == "__main__":
     print()
 
     test_bipartite_graph()
-    test_feature_padding()
+    test_feature_building()
     test_pyg_conversion()
 
     print()
