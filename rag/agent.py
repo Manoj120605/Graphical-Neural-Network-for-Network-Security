@@ -1,4 +1,10 @@
 import os
+import sys
+
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if _PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, _PROJECT_ROOT)
+
 from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage
@@ -13,7 +19,7 @@ from rag.tools import (
     generate_remediation,
     run_gnn_scan,
 )
-from rag.knowledge_base import build_knowledge_base, load_knowledge_base
+from rag.knowledge_base import build_knowledge_base, load_knowledge_base, CHROMA_DIR
 from rag.prompts import SYSTEM_PROMPT
 
 
@@ -34,20 +40,22 @@ def build_agent(llm_backend: str = "ollama", model: str = "llama3.2",
         llm = ChatOpenAI(model=model, temperature=0.1,
                          api_key=os.environ.get("OPENAI_API_KEY"))
 
-    # 2. Vector store + retriever tool
-    if rebuild_kb or not os.path.exists("./chroma_db"):
+    # 2. Vector store (dual poisoning knowledge + GNN reports)
+    if rebuild_kb or not os.path.exists(CHROMA_DIR):
         vectorstore = build_knowledge_base()
     else:
         vectorstore = load_knowledge_base()
 
-    retriever      = vectorstore.as_retriever(search_kwargs={"k": 4})
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
     retriever_tool = create_retriever_tool(
         retriever,
         name="search_network_knowledge",
         description=(
-            "Search the AutoNet-GNN knowledge base for past anomaly reports, "
-            "node history, security patterns, and remediation guidance. "
-            "Use this to get context before explaining or remediating an anomaly."
+            "Search the AutoNet-GNN dual poisoning defense knowledge base. "
+            "Contains: node anomaly reports, feature/structure/dual poisoning "
+            "detection strategies, defense mechanisms, remediation playbooks, "
+            "and real-world attack scenarios. Use this for context before "
+            "explaining or remediating anomalies."
         )
     )
 
@@ -61,13 +69,13 @@ def build_agent(llm_backend: str = "ollama", model: str = "llama3.2",
         retriever_tool,
     ]
 
-    # 4. In-memory conversation history (per thread_id)
+    # 4. Memory
     memory = MemorySaver()
 
     # 5. System prompt
     system_msg = SystemMessage(content=SYSTEM_PROMPT)
 
-    # 6. LangGraph react agent (replaces AgentExecutor)
+    # 6. LangGraph ReAct agent
     agent = create_react_agent(
         llm,
         tools,
