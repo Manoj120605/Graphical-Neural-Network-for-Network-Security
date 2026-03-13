@@ -3,21 +3,48 @@
     {
       "alert_type": "ANOMALY_DETECTED",
       "node_id": 0,
-      "anomaly_score": 5.866937,
-      "threshold": 3.500967,
+      "anomaly_score": 10.189016,
+      "threshold": 6.287235,
       "severity": "HIGH",
       "reason": "deviation from neighborhood embedding",
-      "timestamp": "2026-03-13T04:12:14.898709+00:00"
+      "timestamp": "2026-03-13T05:15:09.104299+00:00"
+    },
+    {
+      "alert_type": "ANOMALY_DETECTED",
+      "node_id": 2,
+      "anomaly_score": 6.449843,
+      "threshold": 6.287235,
+      "severity": "MEDIUM",
+      "reason": "deviation from neighborhood embedding",
+      "timestamp": "2026-03-13T05:15:09.104299+00:00"
+    },
+    {
+      "alert_type": "ANOMALY_DETECTED",
+      "node_id": 18,
+      "anomaly_score": 6.463033,
+      "threshold": 6.287235,
+      "severity": "MEDIUM",
+      "reason": "deviation from neighborhood embedding",
+      "timestamp": "2026-03-13T05:15:09.104299+00:00"
     },
     {
       "alert_type": "ANOMALY_DETECTED",
       "node_id": 21,
-      "anomaly_score": 3.661479,
-      "threshold": 3.500967,
+      "anomaly_score": 6.80973,
+      "threshold": 6.287235,
       "severity": "MEDIUM",
       "reason": "deviation from neighborhood embedding",
-      "timestamp": "2026-03-13T04:12:14.898730+00:00"
+      "timestamp": "2026-03-13T05:15:09.104299+00:00"
+    },
+    {
+      "alert_type": "ANOMALY_DETECTED",
+      "node_id": 43,
+      "anomaly_score": 6.520893,
+      "threshold": 6.287235,
+      "severity": "MEDIUM",
+      "reason": "deviation from neighborhood embedding",
+      "timestamp": "2026-03-13T05:15:09.104299+00:00"
     }
   ],
-  "total": 2
+  "total": 5
 }

@@ -12,7 +12,7 @@ def get_network_topology():
             # Get the IP address from the backbone_net network
             networks = container.attrs['NetworkSettings']['Networks']
             # Note: This name must match the network in your docker-compose.yml
-            ip_addr = networks.get('codetocareear_backbone_net', {}).get('IPAddress')
+            ip_addr = networks.get('node_creation_backbone_net', {}).get('IPAddress')
             
             if ip_addr:
                 device_list.append({
