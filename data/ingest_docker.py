@@ -5,16 +5,15 @@ Bridges live Docker-based network simulation with the GraphSAGE
 anomaly-detection pipeline.
 
 Pipeline
-    1. Ingest   - discover containers & poll telemetry via SSH
+    1. Ingest   - discover containers & poll real 16D telemetry
     2. Graph    - build strict bipartite spine-leaf topology
-    3. Pad      - expand telemetry -> 16D feature vector
+    3. Normalise- z-score normalise features across nodes
     4. Convert  - NetworkX -> PyTorch Geometric Data object
     5. Export   - save to syntheticdata/synthetic_graph.pt
 
 Supports two telemetry modes:
-    A) Legacy  : 1D drift_score from get_telemetry()  (zero-padded to 16D)
-    B) Enriched: full 16D feature vectors from attack simulation or
-                 get_full_telemetry()
+    A) Live     : 16D feature vectors from get_telemetry()
+    B) Attack   : attack_telemetry override from attack_simulator
 """
 
 import os
@@ -37,18 +36,17 @@ if _PROJECT_ROOT not in sys.path:
 
 # NOTE: Node_Creation.autonet_core imports the Docker SDK at module level.
 # We defer that import to ingest() so the pure helper functions
-# (_build_bipartite_graph, _pad_features, _to_pyg_data) can be imported
+# (_build_bipartite_graph, _build_features, _to_pyg_data) can be imported
 # and tested without Docker installed.
 
 # ---- Constants ------------------------------------------------------------
 FEATURE_DIM = 16          # must match GraphSAGEEncoder(in_dim=16)
-DRIFT_INDEX = 0           # position of actual drift score in the 16D vector
 OUTPUT_DIR = "syntheticdata"
 OUTPUT_FILE = "synthetic_graph.pt"
 
 
 # ---------------------------------------------------------------------------
-# Step 2 helper – bipartite spine-leaf graph
+# Step 2 helper -- bipartite spine-leaf graph
 # ---------------------------------------------------------------------------
 def _build_bipartite_graph(node_names: list[str]) -> nx.Graph:
     """
@@ -91,67 +89,79 @@ def _build_bipartite_graph(node_names: list[str]) -> nx.Graph:
 
 
 # ---------------------------------------------------------------------------
-# Step 3 helper – pad 1D telemetry to 16D (legacy mode)
+# Step 3 helper -- build feature matrix from 16D telemetry + normalise
 # ---------------------------------------------------------------------------
-def _pad_features(telemetry: list, node_names: list[str]) -> tuple[np.ndarray, np.ndarray]:
+def _build_features(telemetry, node_names: list[str]) -> tuple[np.ndarray, np.ndarray]:
     """
-    Expand telemetry into a 16-dimensional feature vector.
+    Build the feature matrix from real 16D telemetry vectors returned by
+    get_telemetry().  Apply z-score normalisation per-feature so the GNN
+    receives normalised inputs with variance across nodes.
 
-    Supports two input formats:
-      A) Legacy : list of [name, drift_score] or {'name': ..., 'drift_score': ...}
-                  Score at index 0, zeros elsewhere.
-      B) Enriched: list of {'name': ..., 'features': [16 values], 'drift_score': ...}
-                   Uses the full 16D feature vector directly.
+    Accepts telemetry in two formats:
+      A) List of [node_name, [16D feature list]]  (from get_telemetry)
+      B) List of dicts with 'name' and 'features' keys (from attack_simulator)
+
+    Labels are set to 0 for all nodes (live mode has no ground truth).
 
     Parameters
     ----------
     telemetry : list
-        Telemetry entries from get_telemetry(), get_full_telemetry(),
-        or attack simulator.
+        Telemetry data in format A or B.
     node_names : list[str]
         Ordered master list of container names (defines row ordering).
 
     Returns
     -------
     features : np.ndarray, shape (N, 16)
-    labels   : np.ndarray, shape (N,)  — 1 if drift_score == 1.0 else 0
+    labels   : np.ndarray, shape (N,)  -- all zeros (no ground truth in live mode)
     """
-    # Normalize telemetry into a consistent dict format
-    drift_map: dict[str, float] = {}
-    feature_map: dict[str, list[float]] = {}
-
+    # Map name -> feature vector for O(1) lookup
+    feat_map: dict[str, list[float]] = {}
     for entry in telemetry:
         if isinstance(entry, dict):
-            name = entry["name"]
-            drift_map[name] = float(entry.get("drift_score", 0.0))
-            if "features" in entry and len(entry["features"]) == FEATURE_DIM:
-                feature_map[name] = entry["features"]
-        elif isinstance(entry, (list, tuple)) and len(entry) >= 2:
-            name = entry[0]
-            drift_map[name] = float(entry[1])
+            # Format B: dict with 'name' and 'features' keys
+            name = entry['name']
+            feats = entry.get('features', [0.0] * FEATURE_DIM)
         else:
-            continue
+            # Format A: [name, features_or_scalar]
+            name = entry[0]
+            feats = entry[1]
+
+        # Handle legacy single-bit format (scalar) and new 16D format (list)
+        if isinstance(feats, (int, float)):
+            vec = [0.0] * FEATURE_DIM
+            vec[0] = float(feats)
+            feat_map[name] = vec
+        else:
+            feat_map[name] = [float(f) for f in feats]
 
     num_nodes = len(node_names)
     features = np.zeros((num_nodes, FEATURE_DIM), dtype=np.float32)
-    labels = np.zeros(num_nodes, dtype=np.int64)
 
     for idx, name in enumerate(node_names):
-        score = drift_map.get(name, 0.0)
-        labels[idx] = 1 if score == 1.0 else 0
+        vec = feat_map.get(name, [0.0] * FEATURE_DIM)
+        features[idx, :len(vec)] = vec[:FEATURE_DIM]
 
-        if name in feature_map:
-            # Enriched mode: use full 16D vector
-            features[idx, :] = feature_map[name]
+    # Z-score normalise per feature (so each dimension has mean~0, std~1)
+    # This prevents large-magnitude features (rx_bytes) from dominating
+    for col in range(FEATURE_DIM):
+        col_data = features[:, col]
+        mu = col_data.mean()
+        sigma = col_data.std()
+        if sigma > 1e-8:
+            features[:, col] = (col_data - mu) / sigma
         else:
-            # Legacy mode: drift score at index 0, rest zero-padded
-            features[idx, DRIFT_INDEX] = score
+            # All same value -> zero it out (no discriminative signal)
+            features[:, col] = 0.0
+
+    # Live mode: no ground-truth labels (we do NOT know which nodes are anomalous)
+    labels = np.zeros(num_nodes, dtype=np.int64)
 
     return features, labels
 
 
 # ---------------------------------------------------------------------------
-# Step 4 helper – PyG conversion
+# Step 4 helper -- PyG conversion
 # ---------------------------------------------------------------------------
 def _to_pyg_data(G: nx.Graph, features: np.ndarray,
                  labels: np.ndarray) -> Data:
@@ -165,6 +175,8 @@ def _to_pyg_data(G: nx.Graph, features: np.ndarray,
     pyg.y = torch.tensor(labels, dtype=torch.long)
     pyg.train_mask = torch.ones(pyg.num_nodes, dtype=torch.bool)
     pyg.anomaly_mask = pyg.y.bool()
+    # Mark this as live data (no injected ground truth)
+    pyg.is_live = True
     return pyg
 
 
@@ -178,22 +190,20 @@ def ingest(output_dir: str = OUTPUT_DIR,
     End-to-end live-ingestion pipeline.
 
     1. Discover Docker containers (spine/leaf).
-    2. Poll telemetry (SSH config drift or full metrics).
-    3. Optionally overlay attack simulation telemetry.
-    4. Build bipartite spine-leaf graph.
-    5. Pad features to 16D.
-    6. Convert to PyG ``Data`` and save to disk.
+    2. Poll real 16D telemetry from each container.
+    3. Build bipartite spine-leaf graph.
+    4. Z-score normalise features.
+    5. Convert to PyG ``Data`` and save to disk.
 
     Parameters
     ----------
     output_dir : str
-        Directory to save outputs (default: "syntheticdata").
-    attack_telemetry : list[dict] | None
-        If provided, uses attack simulator telemetry instead of polling
-        containers for telemetry. Each dict must have 'name', 'features',
-        and 'drift_score' keys.
-    attack_log : list[dict] | None
-        If provided, saves the attack log alongside graph data.
+        Directory to save the PyG graph.
+    attack_telemetry : list[dict], optional
+        Override telemetry from the attack simulator. If provided, this
+        is merged with (or replaces) the live telemetry.
+    attack_log : list[dict], optional
+        Attack log to save alongside the graph.
 
     Returns
     -------
@@ -202,7 +212,7 @@ def ingest(output_dir: str = OUTPUT_DIR,
     os.makedirs(output_dir, exist_ok=True)
     start = time.time()
 
-    # Lazy import — requires Docker SDK (only needed for live ingestion)
+    # Lazy import -- requires Docker SDK (only needed for live ingestion)
     from Node_Creation.autonet_core import discover_nodes, get_telemetry
 
     # -- Step 1: Ingestion ---------------------------------------------------
@@ -214,28 +224,39 @@ def ingest(output_dir: str = OUTPUT_DIR,
             "Is Docker running and is the docker-compose stack up?"
         )
 
-    # -- Step 2: Telemetry ---------------------------------------------------
-    if attack_telemetry is not None:
-        # Attack simulation mode: use pre-generated attack telemetry
-        print("[ingest] Step 2/5  Using attack simulation telemetry ...")
-        telemetry = attack_telemetry
-        node_names = [entry["name"] for entry in telemetry]
-    else:
-        # Normal mode: poll containers directly
-        print("[ingest] Step 2/5  Polling telemetry via SSH ...")
-        telemetry = get_telemetry(nodes)
-        if not telemetry:
-            raise RuntimeError(
-                "Telemetry collection returned no results. "
-                "Check SSH connectivity to the containers."
-            )
-        # Extract node names from telemetry
-        node_names = [
-            entry["name"] if isinstance(entry, dict) else entry[0]
-            for entry in telemetry
-        ]
+    print("[ingest] Step 2/5  Polling 16D telemetry via docker exec ...")
+    telemetry = get_telemetry(nodes)
+    if not telemetry:
+        raise RuntimeError(
+            "Telemetry collection returned no results. "
+            "Check Docker container connectivity."
+        )
 
-    # -- Step 3: Bipartite graph ---------------------------------------------
+    # If attack telemetry is provided, merge it over live telemetry
+    mode_label = "LIVE"
+    if attack_telemetry:
+        mode_label = "ATTACK SIMULATION"
+        # Build a lookup of attack overrides by name
+        attack_map = {e['name']: e for e in attack_telemetry if isinstance(e, dict)}
+        merged = []
+        for entry in telemetry:
+            name = entry[0]
+            if name in attack_map:
+                # Use attack-simulated features for this node
+                merged.append(attack_map[name])
+            else:
+                merged.append(entry)
+        telemetry = merged
+
+    # Canonical ordered list of node names
+    node_names = []
+    for entry in telemetry:
+        if isinstance(entry, dict):
+            node_names.append(entry['name'])
+        else:
+            node_names.append(entry[0])
+
+    # -- Step 2: Bipartite graph ---------------------------------------------
     print("[ingest] Step 3/5  Building bipartite spine-leaf graph ...")
     G = _build_bipartite_graph(node_names)
 
@@ -243,15 +264,15 @@ def ingest(output_dir: str = OUTPUT_DIR,
     leaves = [n for n in node_names if "leaf" in n.lower()]
     expected_edges = len(spines) * len(leaves)
     assert G.number_of_edges() == expected_edges, (
-        f"Edge count mismatch: got {G.number_of_edges()}, "
-        f"expected {expected_edges} (|S|={len(spines)} x |L|={len(leaves)})"
+        "Edge count mismatch: got %d, expected %d (|S|=%d x |L|=%d)"
+        % (G.number_of_edges(), expected_edges, len(spines), len(leaves))
     )
 
-    # -- Step 4: Pad features ------------------------------------------------
-    print("[ingest] Step 4/5  Processing features to %dD ..." % FEATURE_DIM)
-    features, labels = _pad_features(telemetry, node_names)
+    # -- Step 3: Build + normalise features ----------------------------------
+    print("[ingest] Step 4/5  Building and normalising 16D features ...")
+    features, labels = _build_features(telemetry, node_names)
 
-    # -- Step 5: PyG conversion ----------------------------------------------
+    # -- Step 4: PyG conversion ----------------------------------------------
     print("[ingest] Step 5/5  Converting to PyTorch Geometric Data ...")
     data = _to_pyg_data(G, features, labels)
 
@@ -262,8 +283,8 @@ def ingest(output_dir: str = OUTPUT_DIR,
     # -- Save attack log if provided -----------------------------------------
     if attack_log is not None:
         import json
-        log_path = os.path.join(output_dir, "attack_log.json")
         from datetime import datetime, timezone
+        log_path = os.path.join(output_dir, "attack_log.json")
         with open(log_path, "w", encoding="utf-8") as f:
             json.dump({
                 "simulation_timestamp": datetime.now(timezone.utc).isoformat(),
@@ -275,12 +296,6 @@ def ingest(output_dir: str = OUTPUT_DIR,
     elapsed = round(time.time() - start, 2)
 
     # -- Summary -------------------------------------------------------------
-    anomaly_count = int(labels.sum())
-    enriched = any(
-        isinstance(e, dict) and "features" in e for e in telemetry
-    )
-    mode_label = "enriched 16D" if enriched else "1D drift (zero-padded)"
-
     print("")
     print("[ingest] ---- Live Ingestion Complete ----")
     print("[ingest] Mode      : %s" % mode_label)
@@ -288,10 +303,8 @@ def ingest(output_dir: str = OUTPUT_DIR,
           % (data.num_nodes, len(spines), len(leaves)))
     print("[ingest] Edges     : %d undirected  (%d directed in PyG)"
           % (G.number_of_edges(), data.edge_index.shape[1]))
-    print("[ingest] Features  : %s  (mode: %s)"
-          % (tuple(data.x.shape), mode_label))
-    print("[ingest] Anomalies : %d / %d nodes (drift_score == 1.0)"
-          % (anomaly_count, data.num_nodes))
+    print("[ingest] Features  : %s  (16D real telemetry, z-normalised)"
+          % (tuple(data.x.shape),))
     print("[ingest] Saved     : %s" % save_path)
     print("[ingest] Elapsed   : %s s" % elapsed)
 

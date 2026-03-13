@@ -20,6 +20,12 @@ import os
 import sys
 import argparse
 
+# Force UTF-8 output on Windows (cp1252 chokes on unicode from dependencies)
+if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if sys.stderr and hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 _ROOT = os.path.dirname(os.path.abspath(__file__))
 os.chdir(_ROOT)
 if _ROOT not in sys.path:

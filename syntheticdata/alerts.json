@@ -2,6 +2,7 @@
   "alerts": [
     {
       "alert_type": "ANOMALY_DETECTED",
+<<<<<<< HEAD
       "node_id": 36,
       "anomaly_score": 0.405756,
       "threshold": 0.18375,
@@ -20,4 +21,33 @@
     }
   ],
   "total": 2
+=======
+      "node_id": 30,
+      "anomaly_score": 1.638204,
+      "threshold": 1.434411,
+      "severity": "MEDIUM",
+      "reason": "deviation from neighborhood embedding",
+      "timestamp": "2026-03-13T08:22:24.743297+00:00"
+    },
+    {
+      "alert_type": "ANOMALY_DETECTED",
+      "node_id": 31,
+      "anomaly_score": 1.459104,
+      "threshold": 1.434411,
+      "severity": "MEDIUM",
+      "reason": "deviation from neighborhood embedding",
+      "timestamp": "2026-03-13T08:22:24.743297+00:00"
+    },
+    {
+      "alert_type": "ANOMALY_DETECTED",
+      "node_id": 49,
+      "anomaly_score": 1.463041,
+      "threshold": 1.434411,
+      "severity": "MEDIUM",
+      "reason": "deviation from neighborhood embedding",
+      "timestamp": "2026-03-13T08:22:24.743297+00:00"
+    }
+  ],
+  "total": 3
+>>>>>>> 6a852f73bb62ee12776b4c386e4f863a444e0e06
 }

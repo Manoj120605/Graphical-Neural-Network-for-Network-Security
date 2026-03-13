@@ -1,6 +1,34 @@
 {
+<<<<<<< HEAD
   "simulation_timestamp": "2026-03-13T08:37:05.776928+00:00",
+=======
+  "simulation_timestamp": "2026-03-13T08:02:22.034911+00:00",
+>>>>>>> 6a852f73bb62ee12776b4c386e4f863a444e0e06
   "attacks": [
+    {
+      "attack_id": "ATK-006",
+      "attack_name": "ARP Spoofing / Man-in-the-Middle",
+      "category": "Man-in-the-Middle",
+      "severity": "high",
+      "mitre_att_ck": "T1557.002",
+      "profile_key": "arp_spoofing",
+      "victim_nodes": [
+        "node_creation-leaf-41",
+        "node_creation-leaf-16"
+      ],
+      "indicators": [
+        "Duplicate IP addresses in ARP table",
+        "MAC address change for gateway",
+        "Broadcast ARP storm",
+        "Unexpected traffic volumes through single host"
+      ],
+      "detection_rules": {
+        "monitor_arp_table_changes": true,
+        "alert_on_duplicate_ip_different_mac": true,
+        "action": "isolate_port_and_alert"
+      },
+      "timestamp": "2026-03-13T08:01:34.397891+00:00"
+    },
     {
       "attack_id": "ATK-002",
       "attack_name": "DNS Hijacking",
@@ -9,8 +37,13 @@
       "mitre_att_ck": "T1584.002",
       "profile_key": "dns_hijacking",
       "victim_nodes": [
+<<<<<<< HEAD
         "node_creation-leaf-15",
         "node_creation-leaf-47"
+=======
+        "node_creation-leaf-10",
+        "node_creation-leaf-28"
+>>>>>>> 6a852f73bb62ee12776b4c386e4f863a444e0e06
       ],
       "indicators": [
         "DNS response source IP mismatch",
@@ -24,7 +57,35 @@
         "dnssec_validation": true,
         "action": "quarantine_host_and_alert"
       },
+<<<<<<< HEAD
       "timestamp": "2026-03-13T08:37:02.022018+00:00"
+=======
+      "timestamp": "2026-03-13T08:01:34.397891+00:00"
+    },
+    {
+      "attack_id": "ATK-004",
+      "attack_name": "Brute Force SSH Credential Attack",
+      "category": "Credential Access",
+      "severity": "high",
+      "mitre_att_ck": "T1110.001",
+      "profile_key": "ssh_brute_force",
+      "victim_nodes": [
+        "node_creation-leaf-31",
+        "node_creation-leaf-18"
+      ],
+      "indicators": [
+        "Repeated SSH auth failures from same IP",
+        "Multiple usernames tried from single source",
+        "Auth attempts at inhuman speed",
+        "Login from unusual geolocation after failures"
+      ],
+      "detection_rules": {
+        "max_failed_logins": 5,
+        "window_seconds": 60,
+        "action": "temporary_ban_and_alert"
+      },
+      "timestamp": "2026-03-13T08:01:34.397891+00:00"
+>>>>>>> 6a852f73bb62ee12776b4c386e4f863a444e0e06
     }
   ],
   "total_attacks": 1

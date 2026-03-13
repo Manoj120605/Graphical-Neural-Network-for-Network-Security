@@ -117,36 +117,52 @@ def detect(data: Data,
     # -- Threshold (2-sigma rule) --
     mean_score = scores.mean().item()
     std_score = scores.std().item()
-    threshold = mean_score + 2 * std_score
 
-    flagged = (scores > threshold).nonzero(as_tuple=True)[0].tolist()
-    true_anomalies = data.y.nonzero(as_tuple=True)[0].tolist()
-    detected = sorted(set(flagged) & set(true_anomalies))
+    # Handle degenerate case: if all embeddings are identical (std=0),
+    # fall back to flagging nodes in the top 5% by absolute score
+    if std_score < 1e-8:
+        print("")
+        print("[detection] WARNING: scores have zero variance (std=%.6f)" % std_score)
+        print("[detection]   All node embeddings are nearly identical.")
+        print("[detection]   Falling back to top-5%% absolute scoring.")
+        k = max(1, int(data.num_nodes * 0.05))
+        topk_vals, topk_idx = torch.topk(scores, k)
+        threshold = topk_vals[-1].item()
+        flagged = topk_idx.tolist()
+    else:
+        threshold = mean_score + 2 * std_score
+        flagged = (scores > threshold).nonzero(as_tuple=True)[0].tolist()
+
+    # -- Detect live vs synthetic mode --
+    is_live = getattr(data, "is_live", False)
 
     # -- Report --
     print("")
     print("[detection] Scores  : mu=%.4f  sigma=%.4f" % (mean_score, std_score))
     print("[detection] Threshold (mu+2s) : %.4f" % threshold)
     print("[detection] Flagged : %s" % flagged)
-    print("[detection] True    : %s" % true_anomalies)
-    print("[detection] Hit     : %s" % (detected if detected else "None (model untrained)"))
+
+    if is_live:
+        print("[detection] Mode    : LIVE (no ground truth -- labels are not validated)")
+    else:
+        true_anomalies = data.y.nonzero(as_tuple=True)[0].tolist()
+        detected = sorted(set(flagged) & set(true_anomalies))
+        print("[detection] True    : %s" % true_anomalies)
+        print("[detection] Hit     : %s" % (detected if detected else "None (model untrained)"))
 
     # -- Per-node table --
     ranked = torch.argsort(scores, descending=True)
     print("")
-    print("%6s  %10s  %7s  %s" % ("Node", "Score", "Label", "Status"))
-    print("-" * 45)
+    print("%6s  %10s  %s" % ("Node", "Score", "Status"))
+    print("-" * 40)
     for node in ranked:
         nid = node.item()
         s = scores[nid].item()
-        lbl = data.y[nid].item()
-        if lbl == 1:
-            tag = "<< ANOMALY"
-        elif nid in flagged:
+        if nid in flagged:
             tag = "<< FLAGGED"
         else:
             tag = ""
-        print("%6d  %10.4f  %7d  %s" % (nid, s, lbl, tag))
+        print("%6d  %10.4f  %s" % (nid, s, tag))
 
     # -- Save CSV --
     csv_path = os.path.join(output_dir, "anomaly_scores.csv")
@@ -154,7 +170,7 @@ def detect(data: Data,
                np.column_stack([np.arange(data.num_nodes),
                                 scores.numpy(),
                                 data.y.numpy()]),
-               header="node_id,anomaly_score,true_label",
+               header="node_id,anomaly_score,label",
                delimiter=",", fmt=["%d", "%.6f", "%d"], comments="")
     print("")
     print("[detection] Saved scores : %s" % csv_path)
