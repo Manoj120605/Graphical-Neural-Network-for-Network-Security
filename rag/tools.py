@@ -15,6 +15,8 @@ DATA_DIR = os.path.join(_PROJECT_ROOT, "syntheticdata")
 GRAPH_PATH = os.path.join(DATA_DIR, "synthetic_graph.pt")
 SCORES_PATH = os.path.join(DATA_DIR, "anomaly_scores.csv")
 ALERTS_PATH = os.path.join(DATA_DIR, "alerts.json")
+ATTACK_LOG_PATH = os.path.join(DATA_DIR, "attack_log.json")
+ATTACK_PATTERNS_DIR = os.path.join(_PROJECT_ROOT, "synthetic-attacks")
 
 # ── Lazy caches ──
 _data_cache = None
@@ -413,3 +415,137 @@ def run_gnn_scan(refresh: bool = True) -> str:
             return "Scan failed:\nSTDOUT: %s\nSTDERR: %s" % (result.stdout, result.stderr)
     except Exception as e:
         return "Error running GNN scan: %s" % e
+
+
+@tool
+def simulate_attack(attack_id: str = "random") -> str:
+    """
+    Simulate a specific attack pattern from the synthetic-attacks library
+    and re-run the GNN detection pipeline.
+    Args:
+        attack_id: Attack pattern ID (e.g. 'ATK-001') or 'random' for random selection
+    """
+    global _data_cache, _scores_cache
+    _data_cache = None
+    _scores_cache = None
+
+    try:
+        from Node_Creation.attack_simulator import (
+            load_attack_patterns, simulate_attacks as run_sim,
+        )
+
+        patterns = load_attack_patterns(ATTACK_PATTERNS_DIR)
+        if not patterns:
+            return "No attack patterns found in %s" % ATTACK_PATTERNS_DIR
+
+        if attack_id.lower() != "random":
+            selected = [p for p in patterns if p.get("id") == attack_id.upper()]
+            if not selected:
+                available = ", ".join(p.get("id", "?") for p in patterns)
+                return "Attack ID '%s' not found. Available: %s" % (attack_id, available)
+        else:
+            selected = None  # will use random selection
+
+        # Build node name list from existing graph or mock
+        data = _load_data()
+        if data is not None and hasattr(data, 'num_nodes'):
+            # Use node names from graph attributes if available
+            node_names = [
+                "node_creation-spine-%d" % i if i < 4
+                else "node_creation-leaf-%d" % (i - 3)
+                for i in range(data.num_nodes)
+            ]
+        else:
+            node_names = (
+                ["node_creation-spine-%d" % i for i in range(1, 5)]
+                + ["node_creation-leaf-%d" % i for i in range(1, 37)]
+            )
+
+        if selected:
+            from Node_Creation.attack_simulator import generate_attack_telemetry
+            telemetry, attack_log = generate_attack_telemetry(
+                node_names, selected, victims_per_attack=2,
+            )
+        else:
+            telemetry, attack_log = run_sim(
+                node_names, ATTACK_PATTERNS_DIR,
+                num_attacks=2, victims_per_attack=2,
+            )
+
+        # Re-run pipeline with attack telemetry
+        import subprocess
+        from Node_Creation.attack_simulator import save_attack_log
+        save_attack_log(attack_log, DATA_DIR)
+
+        result = "ATTACK SIMULATION COMPLETE\n"
+        result += "=" * 40 + "\n\n"
+        for event in attack_log:
+            result += "Attack: %s (%s)\n" % (event["attack_name"], event["attack_id"])
+            result += "Category: %s | Severity: %s\n" % (event["category"], event["severity"])
+            result += "MITRE: %s\n" % event.get("mitre_att_ck", "N/A")
+            result += "Victims: %s\n" % ", ".join(event["victim_nodes"])
+            result += "\n"
+
+        attacked = sum(1 for t in telemetry if t["drift_score"] == 1.0)
+        result += "Total: %d nodes attacked out of %d\n" % (attacked, len(telemetry))
+
+        return result
+
+    except Exception as e:
+        return "Error running attack simulation: %s" % e
+
+
+@tool
+def query_attack_patterns(search_term: str = "all") -> str:
+    """
+    Search the attack pattern library by category, severity, MITRE ID,
+    or attack name. Use 'all' to list all available patterns.
+    Args:
+        search_term: Search term (e.g. 'DDoS', 'critical', 'T1498', or 'all')
+    """
+    patterns = []
+    if os.path.isdir(ATTACK_PATTERNS_DIR):
+        for fname in sorted(os.listdir(ATTACK_PATTERNS_DIR)):
+            if fname.startswith("ATK-") and fname.endswith(".json"):
+                fpath = os.path.join(ATTACK_PATTERNS_DIR, fname)
+                with open(fpath, "r", encoding="utf-8") as f:
+                    patterns.append(json.load(f))
+
+    if not patterns:
+        return "No attack patterns found in %s" % ATTACK_PATTERNS_DIR
+
+    # Filter
+    term = search_term.lower()
+    if term != "all":
+        filtered = [
+            p for p in patterns
+            if term in p.get("name", "").lower()
+            or term in p.get("category", "").lower()
+            or term in p.get("severity", "").lower()
+            or term in p.get("mitre_att_ck", "").lower()
+            or term in p.get("id", "").lower()
+            or term in p.get("description", "").lower()
+        ]
+    else:
+        filtered = patterns
+
+    if not filtered:
+        return "No attack patterns match '%s'. Use 'all' to list everything." % search_term
+
+    result = "ATTACK PATTERN LIBRARY (%d matches)\n" % len(filtered)
+    result += "=" * 50 + "\n\n"
+
+    for p in filtered:
+        result += "[%s] %s\n" % (p.get("id", "?"), p.get("name", "Unknown"))
+        result += "  Category : %s\n" % p.get("category", "?")
+        result += "  MITRE    : %s\n" % p.get("mitre_att_ck", "?")
+        result += "  Severity : %s\n" % p.get("severity", "?")
+        result += "  Desc     : %s\n" % p.get("description", "")
+        iocs = p.get("indicators_of_compromise", [])
+        if iocs:
+            result += "  IoCs     :\n"
+            for ioc in iocs:
+                result += "    - %s\n" % ioc
+        result += "\n"
+
+    return result

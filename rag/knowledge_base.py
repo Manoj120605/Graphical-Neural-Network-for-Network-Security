@@ -28,6 +28,8 @@ DATA_DIR = os.path.join(_PROJECT_ROOT, "syntheticdata")
 GRAPH_PATH = os.path.join(DATA_DIR, "synthetic_graph.pt")
 SCORES_PATH = os.path.join(DATA_DIR, "anomaly_scores.csv")
 ALERTS_PATH = os.path.join(DATA_DIR, "alerts.json")
+ATTACK_LOG_PATH = os.path.join(DATA_DIR, "attack_log.json")
+ATTACK_PATTERNS_DIR = os.path.join(_PROJECT_ROOT, "synthetic-attacks")
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -403,6 +405,85 @@ Timestamp: %s
     # ── 3. Dual poisoning defense knowledge corpus ──
     documents.extend(DUAL_POISONING_DOCS)
 
+    # ── 4. Synthetic attack pattern knowledge ──
+    if os.path.isdir(ATTACK_PATTERNS_DIR):
+        atk_count = 0
+        for fname in sorted(os.listdir(ATTACK_PATTERNS_DIR)):
+            if fname.startswith("ATK-") and fname.endswith(".json"):
+                fpath = os.path.join(ATTACK_PATTERNS_DIR, fname)
+                with open(fpath, "r", encoding="utf-8") as f:
+                    atk = json.load(f)
+
+                iocs = "\n".join("  - %s" % i for i in atk.get("indicators_of_compromise", []))
+                det_rules = json.dumps(atk.get("detection_rules", {}), indent=2)
+                sim_info = json.dumps(atk.get("simulation", {}), indent=2)
+
+                content = """
+Attack Pattern: %s
+ID: %s
+Category: %s
+MITRE ATT&CK: %s
+Severity: %s
+Description: %s
+
+Indicators of Compromise:
+%s
+
+Detection Rules:
+%s
+
+Simulation Parameters:
+%s
+""" % (atk.get("name", "Unknown"), atk.get("id", "???"),
+       atk.get("category", "Unknown"), atk.get("mitre_att_ck", ""),
+       atk.get("severity", "unknown"), atk.get("description", ""),
+       iocs, det_rules, sim_info)
+
+                documents.append(Document(
+                    page_content=content,
+                    metadata={
+                        "type": "attack_pattern",
+                        "attack_id": atk.get("id", ""),
+                        "category": atk.get("category", ""),
+                        "severity": atk.get("severity", ""),
+                        "mitre": atk.get("mitre_att_ck", ""),
+                    },
+                ))
+                atk_count += 1
+        print("[kb] Indexed %d attack patterns" % atk_count)
+
+    # ── 5. Attack simulation log ──
+    if os.path.exists(ATTACK_LOG_PATH):
+        with open(ATTACK_LOG_PATH, "r", encoding="utf-8") as f:
+            atk_log = json.load(f)
+        for event in atk_log.get("attacks", []):
+            victims = ", ".join(event.get("victim_nodes", []))
+            iocs = "\n".join("  - %s" % i for i in event.get("indicators", []))
+            content = """
+Simulated Attack Event
+Attack: %s (%s)
+Category: %s
+Severity: %s
+MITRE ATT&CK: %s
+Victim Nodes: %s
+Timestamp: %s
+
+Expected Indicators:
+%s
+""" % (event.get("attack_name", "Unknown"), event.get("attack_id", "???"),
+       event.get("category", ""), event.get("severity", ""),
+       event.get("mitre_att_ck", ""), victims,
+       event.get("timestamp", "unknown"), iocs)
+
+            documents.append(Document(
+                page_content=content,
+                metadata={
+                    "type": "attack_simulation",
+                    "attack_id": event.get("attack_id", ""),
+                },
+            ))
+        print("[kb] Indexed %d attack simulation events" % len(atk_log.get("attacks", [])))
+
     # ── Build ──
     vectorstore = Chroma.from_documents(
         documents=documents,
@@ -410,11 +491,7 @@ Timestamp: %s
         persist_directory=CHROMA_DIR,
     )
 
-    print("[kb] Knowledge base built: %d documents indexed "
-          "(%d node reports, %d knowledge docs)"
-          % (len(documents),
-             len(documents) - len(DUAL_POISONING_DOCS),
-             len(DUAL_POISONING_DOCS)))
+    print("[kb] Knowledge base built: %d total documents indexed" % len(documents))
     return vectorstore
 
 

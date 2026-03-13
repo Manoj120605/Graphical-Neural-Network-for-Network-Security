@@ -18,6 +18,8 @@ from rag.tools import (
     get_neighbors,
     generate_remediation,
     run_gnn_scan,
+    simulate_attack,
+    query_attack_patterns,
 )
 from rag.knowledge_base import build_knowledge_base, load_knowledge_base, CHROMA_DIR
 from rag.prompts import SYSTEM_PROMPT
@@ -51,8 +53,9 @@ def build_agent(llm_backend: str = "ollama", model: str = "llama3.2",
         retriever,
         name="search_network_knowledge",
         description=(
-            "Search the AutoNet-GNN dual poisoning defense knowledge base. "
-            "Contains: node anomaly reports, feature/structure/dual poisoning "
+            "Search the AutoNet-GNN knowledge base. "
+            "Contains: node anomaly reports, attack pattern definitions, "
+            "attack simulation logs, feature/structure/dual poisoning "
             "detection strategies, defense mechanisms, remediation playbooks, "
             "and real-world attack scenarios. Use this for context before "
             "explaining or remediating anomalies."
@@ -66,6 +69,8 @@ def build_agent(llm_backend: str = "ollama", model: str = "llama3.2",
         get_neighbors,
         generate_remediation,
         run_gnn_scan,
+        simulate_attack,
+        query_attack_patterns,
         retriever_tool,
     ]
 
