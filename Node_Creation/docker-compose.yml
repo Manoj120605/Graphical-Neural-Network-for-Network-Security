@@ -1,10 +1,16 @@
-version: '3.8'
-
 services:
   # SPINE NODES (The Core of the Graph)
   spine:
     image: alpine:latest
-    command: sh -c "apk add --no-cache iproute2 net-snmp && tail -f /dev/null"
+    command: >
+      sh -c "
+        apk add --no-cache iproute2 net-snmp openssh &&
+        ssh-keygen -A &&
+        echo 'root:root' | chpasswd &&
+        echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config &&
+        /usr/sbin/sshd &&
+        tail -f /dev/null
+      "
     deploy:
       replicas: 4
     networks:
@@ -13,7 +19,15 @@ services:
   # LEAF NODES (The Edge of the Graph)
   leaf:
     image: alpine:latest
-    command: sh -c "apk add --no-cache iproute2 net-snmp openssh && tail -f /dev/null"
+    command: >
+      sh -c "
+        apk add --no-cache iproute2 net-snmp openssh &&
+        ssh-keygen -A &&
+        echo 'root:root' | chpasswd &&
+        echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config &&
+        /usr/sbin/sshd &&
+        tail -f /dev/null
+      "
     deploy:
       replicas: 36
     networks:
@@ -26,4 +40,4 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 10.10.0.0/16
+        - subnet: 10.10.10.0/24
