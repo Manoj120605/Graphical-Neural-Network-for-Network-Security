@@ -3,7 +3,7 @@ import sys
 import json
 import torch
 import numpy as np
-from langchain.tools import tool
+from langchain_core.tools import tool
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'GNN'))
 
