@@ -1,0 +1,169 @@
+========================================================================
+  AutoNet-GNN  ·  Pipeline Execution Report
+  Generated: 2026-03-13 08:37:42 UTC
+========================================================================
+
+┌─ PIPELINE SUMMARY ──────────────────────────────────────┐
+│
+│  Start Time   : 2026-03-13T08:36:56.087186+00:00
+│  End Time     : 2026-03-13T08:37:42.401858+00:00
+│  Duration     : 46.31 seconds
+│  Nodes        : 54
+│  Edges        : 200
+│  GNN Model    : GraphSAGE (16→32→16)
+│  Threshold    : 0.18375 (2-sigma)
+│  Flagged      : 2 nodes
+│
+└──────────────────────────────────────────────────────────┘
+
+┌─ ATTACK SIMULATION ─────────────────────────────────────┐
+│
+│  Attacks Simulated: 1
+│
+│  ▸ [ATK-002] DNS Hijacking
+│    Category : Man-in-the-Middle / Credential Access
+│    Severity : high
+│    MITRE    : T1584.002
+│    Victims  : node_creation-leaf-15, node_creation-leaf-47
+│    IoCs     :
+│      - DNS response source IP mismatch
+│      - Unexpected CNAME chains
+│      - DNS TTL values suddenly very low
+│      - Multiple NXDOMAIN followed by sudden resolution
+│
+└──────────────────────────────────────────────────────────┘
+
+┌─ GNN ANOMALY DETECTION ──────────────────────────────────┐
+│
+│  Mean Score   : 0.046136
+│  Std Score    : 0.068807
+│  Max Score    : 0.405756
+│  Min Score    : 0.026426
+│  Threshold    : 0.18375
+│
+│  Flagged Nodes:
+│    Node 36   : score = 0.405756
+│    Node 44   : score = 0.380741
+│
+└──────────────────────────────────────────────────────────┘
+
+┌─ DUAL-PLANE STRUCTURAL POISONING VERIFICATION ──────────┐
+│
+│  Feature Plane Anomalies  : 2
+│  Structure Plane Anomalies: 0
+│
+│  CLEAN                   : 52 nodes
+│  FEATURE_POISONED        : 2 nodes
+│
+│  Affected Nodes:
+│    Node 36   : FEATURE_POISONED (confidence: 83%)
+│    Node 44   : FEATURE_POISONED (confidence: 81%)
+│
+└──────────────────────────────────────────────────────────┘
+
+┌─ ROOT CAUSE ANALYSIS ────────────────────────────────────┐
+│
+│  ── ANOMALY SCAN (success) ──
+│  **Severity:** HIGH
+│  **Poisoning Classification:** DUAL
+│  **Findings:**
+│  * Node 36 has a high anomaly score (5.3-sigma) with a ground truth o
+│  * Node 44 has a moderate anomaly score (4.9-sigma) with a ground tru
+│  * Both nodes have significant deviations from their neighborhood emb
+│  
+│  **Analysis:** The dual poisoning attack is suspected, as both nodes 
+│  
+│  **Recommendations:**
+│  1. **Run GNN Scan**: Trigger a live re-scan of the network to gather
+│  2. **Explain Node 36**: Use `explain_node` to gain insight into why 
+│  3. **Explain Node 44**: Similarly, use `explain_node` to understand 
+│  4. **Generate Remediation Plan**: Based on the findings, create a re
+│
+│  ── ROOT CAUSE (success) ──
+│  **Summary of Anomalies**
+│  
+│  1. Node 36:
+│  	* Anomaly Score: 0.4058 (5.3-sigma above mean)
+│  	* Poisoning Type: FEATURE
+│  	* Assessment: Confirmed anomaly, feature poisoning suspected
+│  2. Node 44:
+│  	* Anomaly Score: 0.3807 (4.9-sigma above mean)
+│  	* Poisoning Type: FEATURE
+│  	* Assessment: Confirmed anomaly, feature poisoning suspected
+│  
+│  **Recommendations**
+│  
+│  1. Isolate nodes 36 and 44 from production traffic to prevent furthe
+│  2. Run a config audit against the last known-good baseline to identi
+│  3. Check authentication logs for unauthorized access and verify tele
+│  4. Validate physical topology matches logical graph to ensure that s
+│  
+│  **Next Steps**
+│  
+│  1. Investigate the cause of the anomalies and determine the best cou
+│  2. Implement additional security measures to prevent similar attacks
+│  3. Monitor node activity and adjust isolation and auditing as necess
+│
+│  ── REMEDIATION (success) ──
+│  Remediation Action Plan for Detected Anomalies
+│  =============================================
+│  
+│  **Severity Priority**
+│  
+│  1. Critical (High Impact, High Severity)
+│  2. High (Moderate Impact, Moderate Severity)
+│  3. Medium (Low Impact, Low Severity)
+│  
+│  **Immediate Containment Steps**
+│  
+│  1. **Node Isolation**: Immediately isolate nodes 36 and 44 from prod
+│  	* Use network segmentation or firewall rules to restrict access to 
+│  	* Monitor node activity closely to ensure no further anomalies occu
+│  2. **System Monitoring**: Activate system monitoring tools to collec
+│  	* Use tools like Prometheus, Grafana, and ELK Stack to monitor syst
+│  
+│  **Investigation Actions**
+│  
+│  1. **Anomaly Analysis**: Conduct a thorough analysis of the detected
+│  	* Review system logs, configuration files, and network traffic to u
+│  	* Use tools like Wireshark or Tcpdump to analyze network traffic an
+│  2. **Security Auditing**: Perform a comprehensive security audit to 
+│  	* Review system configurations, user permissions, and access contro
+│  	* Use tools like Nessus or OpenVAS to scan for known vulnerabilitie
+│  
+│  **Long-term Hardening Measures**
+│  
+│  1. **Network Segmentation**: Implement network segmentation to isola
+│  	* Use virtualization or containerization to create isolated environ
+│  	* Regularly review and update network configurations to ensure they
+│  2. **Access Control**: Implement strict access controls to limit use
+│  	* Use role-based access control (RBAC) or attribute-based access co
+│  	* Regularly review and update access controls to ensure they remain
+│  3. **Security Updates**: Apply security updates and patches to all s
+│  	* Regularly review and apply security patches for known vulnerabili
+│  	* Use tools like Patch Manager or Security Update Manager to automa
+│  4. **Monitoring and Incident Response**: Establish a monitoring and 
+│  	* Use tools like Splunk or ELK Stack to monitor system activity and
+│  	* Develop an incident response plan that includes procedures for co
+│  
+│  **Prioritized Remediation Plan**
+│  
+│  1. Critical (High Impact, High Severity):
+│  	* Isolate nodes 36 and 44 from production traffic immediately.
+│  	* Activate system monitoring tools to collect logs and performance 
+│  	* Conduct a thorough analysis of the detected anomalies to identify
+│  2. High (Moderate Impact, Moderate Severity):
+│  	* Implement network segmentation to isolate critical systems and da
+│  	* Review and update access controls to limit user privileges.
+│  	* Apply security updates and patches to all systems and application
+│  3. Medium (Low Impact, Low Severity):
+│  	* Establish a monitoring and incident response plan to quickly dete
+│  	* Regularly review and update system configurations, user permissio
+│  
+│  By following this remediation action plan, you can effectively conta
+│
+└──────────────────────────────────────────────────────────┘
+
+========================================================================
+  End of Report  |  AutoNet-GNN v2.0  |  Dual Poisoning Defense
+========================================================================

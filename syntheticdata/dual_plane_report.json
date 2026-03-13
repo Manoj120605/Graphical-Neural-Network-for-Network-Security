@@ -1,0 +1,1097 @@
+{
+  "timestamp": "2026-03-13T08:37:05.838159+00:00",
+  "summary": {
+    "total_nodes": 54,
+    "feature_anomalies": 2,
+    "structure_anomalies": 0,
+    "classifications": {
+      "CLEAN": 52,
+      "FEATURE_POISONED": 2
+    }
+  },
+  "nodes": {
+    "0": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.029911,
+      "feature_norm": 0.1832,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "link_utilization",
+          "value": 0.042,
+          "z_score": -1.55
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "1": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.035619,
+      "feature_norm": 0.1723,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "2": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.03008,
+      "feature_norm": 0.1808,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "3": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.030671,
+      "feature_norm": 0.1764,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "cpu_usage",
+          "value": 0.0609,
+          "z_score": -1.57
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "4": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.02944,
+      "feature_norm": 0.2087,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "memory_usage",
+          "value": 0.1384,
+          "z_score": 1.76
+        },
+        {
+          "name": "neighbor_count",
+          "value": 0.0692,
+          "z_score": 1.75
+        },
+        {
+          "name": "queue_depth",
+          "value": 0.0376,
+          "z_score": 1.52
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "5": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.028504,
+      "feature_norm": 0.186,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "6": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.032054,
+      "feature_norm": 0.2021,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "7": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.031179,
+      "feature_norm": 0.1722,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "link_utilization",
+          "value": 0.0411,
+          "z_score": -1.63
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "8": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.034952,
+      "feature_norm": 0.1877,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "crc_errors",
+          "value": 0.0181,
+          "z_score": 1.56
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "9": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.030746,
+      "feature_norm": 0.1729,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "dropped_packets",
+          "value": 0.0297,
+          "z_score": 1.9
+        },
+        {
+          "name": "crc_errors",
+          "value": 0.018,
+          "z_score": 1.54
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "10": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.035098,
+      "feature_norm": 0.1741,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "crc_errors",
+          "value": 0.0191,
+          "z_score": 1.69
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "11": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.032784,
+      "feature_norm": 0.1736,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "12": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.031675,
+      "feature_norm": 0.1754,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "13": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.033002,
+      "feature_norm": 0.1779,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "dropped_packets",
+          "value": 0.0263,
+          "z_score": 1.55
+        },
+        {
+          "name": "cpu_usage",
+          "value": 0.096,
+          "z_score": 1.52
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "14": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.032713,
+      "feature_norm": 0.1623,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "dropped_packets",
+          "value": 0.0259,
+          "z_score": 1.52
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "15": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.032146,
+      "feature_norm": 0.1912,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "16": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.02935,
+      "feature_norm": 0.1966,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "queue_depth",
+          "value": 0.0377,
+          "z_score": 1.53
+        },
+        {
+          "name": "link_utilization",
+          "value": 0.0425,
+          "z_score": -1.52
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "17": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.030994,
+      "feature_norm": 0.2085,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "cpu_usage",
+          "value": 0.0974,
+          "z_score": 1.64
+        },
+        {
+          "name": "packet_loss",
+          "value": 0.0283,
+          "z_score": 1.58
+        },
+        {
+          "name": "link_utilization",
+          "value": 0.0787,
+          "z_score": 1.57
+        },
+        {
+          "name": "queue_depth",
+          "value": 0.0378,
+          "z_score": 1.54
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "18": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.034049,
+      "feature_norm": 0.1931,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "19": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.034057,
+      "feature_norm": 0.1807,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "neighbor_count",
+          "value": 0.0301,
+          "z_score": -1.61
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "20": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.032609,
+      "feature_norm": 0.1732,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "21": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.032771,
+      "feature_norm": 0.1856,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "crc_errors",
+          "value": 0.0191,
+          "z_score": 1.68
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "22": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.02981,
+      "feature_norm": 0.1918,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "23": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.030846,
+      "feature_norm": 0.1945,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "24": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.03198,
+      "feature_norm": 0.1651,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "jitter",
+          "value": 0.025,
+          "z_score": 1.52
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "25": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.035325,
+      "feature_norm": 0.189,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "26": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.030613,
+      "feature_norm": 0.194,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "traffic_in",
+          "value": 0.0697,
+          "z_score": 1.87
+        },
+        {
+          "name": "memory_usage",
+          "value": 0.1374,
+          "z_score": 1.67
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "27": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.026426,
+      "feature_norm": 0.1936,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "jitter",
+          "value": 0.0275,
+          "z_score": 1.8
+        },
+        {
+          "name": "cpu_usage",
+          "value": 0.0604,
+          "z_score": -1.61
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "28": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.032341,
+      "feature_norm": 0.1658,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "link_utilization",
+          "value": 0.0402,
+          "z_score": -1.71
+        },
+        {
+          "name": "memory_usage",
+          "value": 0.1001,
+          "z_score": -1.6
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "29": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.028386,
+      "feature_norm": 0.1891,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "30": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.032933,
+      "feature_norm": 0.1758,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "crc_errors",
+          "value": 0.0194,
+          "z_score": 1.73
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "31": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.032362,
+      "feature_norm": 0.1681,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "32": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.034194,
+      "feature_norm": 0.1916,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "traffic_in",
+          "value": 0.069,
+          "z_score": 1.82
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "33": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.03425,
+      "feature_norm": 0.2041,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "crc_errors",
+          "value": 0.02,
+          "z_score": 1.81
+        },
+        {
+          "name": "memory_usage",
+          "value": 0.1365,
+          "z_score": 1.59
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "34": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.033251,
+      "feature_norm": 0.1698,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "35": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.031401,
+      "feature_norm": 0.1887,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "jitter",
+          "value": 0.0276,
+          "z_score": 1.81
+        },
+        {
+          "name": "neighbor_count",
+          "value": 0.0302,
+          "z_score": -1.61
+        },
+        {
+          "name": "cpu_usage",
+          "value": 0.0968,
+          "z_score": 1.59
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "36": {
+      "classification": "FEATURE_POISONED",
+      "feature_anomaly": true,
+      "structure_anomaly": false,
+      "confidence": 0.83,
+      "severity": "HIGH",
+      "feature_score": 0.405756,
+      "feature_norm": 1.2552,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "connection_count",
+          "value": 0.6703,
+          "z_score": 5.7
+        },
+        {
+          "name": "route_changes",
+          "value": 0.7468,
+          "z_score": 5.29
+        },
+        {
+          "name": "latency",
+          "value": 0.4426,
+          "z_score": 5.19
+        },
+        {
+          "name": "retransmissions",
+          "value": 0.3271,
+          "z_score": 5.06
+        },
+        {
+          "name": "interface_errors",
+          "value": 0.1654,
+          "z_score": 4.84
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "37": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.032717,
+      "feature_norm": 0.168,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "link_utilization",
+          "value": 0.0409,
+          "z_score": -1.65
+        },
+        {
+          "name": "queue_depth",
+          "value": 0.0012,
+          "z_score": -1.55
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "38": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.036175,
+      "feature_norm": 0.1789,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "link_utilization",
+          "value": 0.0782,
+          "z_score": 1.53
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "39": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.035945,
+      "feature_norm": 0.1728,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "cpu_usage",
+          "value": 0.0603,
+          "z_score": -1.62
+        },
+        {
+          "name": "packet_loss",
+          "value": 0.0285,
+          "z_score": 1.6
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "40": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.034862,
+      "feature_norm": 0.1925,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "41": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.032617,
+      "feature_norm": 0.1842,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "cpu_usage",
+          "value": 0.0977,
+          "z_score": 1.67
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "42": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.031004,
+      "feature_norm": 0.173,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "jitter",
+          "value": 0.0254,
+          "z_score": 1.56
+        },
+        {
+          "name": "memory_usage",
+          "value": 0.1012,
+          "z_score": -1.5
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "43": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.034195,
+      "feature_norm": 0.1937,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "link_utilization",
+          "value": 0.0784,
+          "z_score": 1.55
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "44": {
+      "classification": "FEATURE_POISONED",
+      "feature_anomaly": true,
+      "structure_anomaly": false,
+      "confidence": 0.81,
+      "severity": "HIGH",
+      "feature_score": 0.380741,
+      "feature_norm": 1.1751,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "traffic_out",
+          "value": 0.5323,
+          "z_score": 5.47
+        },
+        {
+          "name": "interface_errors",
+          "value": 0.1753,
+          "z_score": 5.15
+        },
+        {
+          "name": "retransmissions",
+          "value": 0.324,
+          "z_score": 5.01
+        },
+        {
+          "name": "latency",
+          "value": 0.4199,
+          "z_score": 4.9
+        },
+        {
+          "name": "route_changes",
+          "value": 0.6917,
+          "z_score": 4.89
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "45": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.031662,
+      "feature_norm": 0.1959,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "queue_depth",
+          "value": 0.0388,
+          "z_score": 1.62
+        },
+        {
+          "name": "cpu_usage",
+          "value": 0.0969,
+          "z_score": 1.6
+        },
+        {
+          "name": "dropped_packets",
+          "value": 0.0267,
+          "z_score": 1.59
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "46": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.034315,
+      "feature_norm": 0.1789,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "traffic_in",
+          "value": 0.0679,
+          "z_score": 1.72
+        },
+        {
+          "name": "dropped_packets",
+          "value": 0.0264,
+          "z_score": 1.56
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "47": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.033016,
+      "feature_norm": 0.1886,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "link_utilization",
+          "value": 0.0402,
+          "z_score": -1.71
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "48": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.032361,
+      "feature_norm": 0.1801,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [
+        {
+          "name": "neighbor_count",
+          "value": 0.0698,
+          "z_score": 1.8
+        },
+        {
+          "name": "traffic_in",
+          "value": 0.068,
+          "z_score": 1.73
+        },
+        {
+          "name": "packet_loss",
+          "value": 0.0283,
+          "z_score": 1.58
+        }
+      ],
+      "anomalous_neighbors": 0
+    },
+    "49": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.034785,
+      "feature_norm": 0.1778,
+      "structure_degree": 4,
+      "structure_role": "leaf",
+      "top_features": [],
+      "anomalous_neighbors": 0
+    },
+    "50": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.037978,
+      "feature_norm": 0.1816,
+      "structure_degree": 50,
+      "structure_role": "spine",
+      "top_features": [
+        {
+          "name": "jitter",
+          "value": 0.0266,
+          "z_score": 1.7
+        },
+        {
+          "name": "queue_depth",
+          "value": 0.0007,
+          "z_score": -1.59
+        }
+      ],
+      "anomalous_neighbors": 2
+    },
+    "51": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.035904,
+      "feature_norm": 0.1927,
+      "structure_degree": 50,
+      "structure_role": "spine",
+      "top_features": [
+        {
+          "name": "memory_usage",
+          "value": 0.1369,
+          "z_score": 1.62
+        },
+        {
+          "name": "packet_loss",
+          "value": 0.0278,
+          "z_score": 1.53
+        },
+        {
+          "name": "queue_depth",
+          "value": 0.0375,
+          "z_score": 1.52
+        }
+      ],
+      "anomalous_neighbors": 2
+    },
+    "52": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.042416,
+      "feature_norm": 0.204,
+      "structure_degree": 50,
+      "structure_role": "spine",
+      "top_features": [
+        {
+          "name": "memory_usage",
+          "value": 0.1388,
+          "z_score": 1.79
+        }
+      ],
+      "anomalous_neighbors": 2
+    },
+    "53": {
+      "classification": "CLEAN",
+      "feature_anomaly": false,
+      "structure_anomaly": false,
+      "confidence": 0.95,
+      "severity": "NORMAL",
+      "feature_score": 0.036375,
+      "feature_norm": 0.1642,
+      "structure_degree": 50,
+      "structure_role": "spine",
+      "top_features": [],
+      "anomalous_neighbors": 2
+    }
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "simulation_timestamp": "2026-03-13T07:38:16.334692+00:00",
+  "simulation_timestamp": "2026-03-13T08:37:05.776928+00:00",
   "attacks": [
     {
       "attack_id": "ATK-002",
@@ -9,8 +9,8 @@
       "mitre_att_ck": "T1584.002",
       "profile_key": "dns_hijacking",
       "victim_nodes": [
-        "node_creation-leaf-8",
-        "node_creation-leaf-2"
+        "node_creation-leaf-15",
+        "node_creation-leaf-47"
       ],
       "indicators": [
         "DNS response source IP mismatch",
@@ -24,63 +24,8 @@
         "dnssec_validation": true,
         "action": "quarantine_host_and_alert"
       },
-      "timestamp": "2026-03-13T07:38:16.333253+00:00"
-    },
-    {
-      "attack_id": "ATK-001",
-      "attack_name": "DDoS Pulse Wave Attack",
-      "category": "Denial of Service",
-      "severity": "critical",
-      "mitre_att_ck": "T1498",
-      "profile_key": "ddos_pulse_wave",
-      "victim_nodes": [
-        "node_creation-leaf-20",
-        "node_creation-leaf-18"
-      ],
-      "indicators": [
-        "Sudden spike >100x baseline traffic",
-        "High UDP/ICMP ratio",
-        "Identical packet sizes in bursts",
-        "Short TTL values across many sources"
-      ],
-      "detection_rules": {
-        "threshold_pps": 50000,
-        "window_seconds": 5,
-        "action": "block_and_alert"
-      },
-      "timestamp": "2026-03-13T07:38:16.333269+00:00"
-    },
-    {
-      "attack_id": "ATK-005",
-      "attack_name": "SQL Injection \u2014 UNION-Based Exfiltration",
-      "category": "Initial Access / Exfiltration",
-      "severity": "critical",
-      "mitre_att_ck": "T1190",
-      "profile_key": "sql_injection",
-      "victim_nodes": [
-        "node_creation-leaf-17",
-        "node_creation-leaf-11"
-      ],
-      "indicators": [
-        "SQL keywords in HTTP query parameters",
-        "Unusual response sizes for identical endpoints",
-        "High error rate followed by large data response",
-        "Requests with encoded quotes/dashes/semicolons"
-      ],
-      "detection_rules": {
-        "waf_sql_keyword_patterns": [
-          "UNION",
-          "SELECT",
-          "DROP",
-          "OR 1=1",
-          "--",
-          "xp_"
-        ],
-        "response_size_anomaly_factor": 5,
-        "action": "block_request_and_alert"
-      },
-      "timestamp": "2026-03-13T07:38:16.333275+00:00"
+      "timestamp": "2026-03-13T08:37:02.022018+00:00"
     }
   ],
-  "total_attacks": 3
+  "total_attacks": 1
 }
